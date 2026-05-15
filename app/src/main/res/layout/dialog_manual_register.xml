@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 효능군 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="#8D8D8D" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="효능군"
+            android:textColor="#000000"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/et_category_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="예: 혈압약, 당뇨약"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 약 이름 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="#8D8D8D" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="약 이름  (쉼표로 구분할 것)"
+            android:textColor="#000000"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/et_drug_names"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="예: 노바스크, 아스피린"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 복용 기간 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="13dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@android:drawable/ic_menu_my_calendar"
+            app:tint="#8D8D8D" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="복용 기간"
+            android:textColor="#000000"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_start_date"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#F4F4F4"
+            android:padding="12dp"
+            android:text="시작일 선택"
+            android:textColor="#111111" />
+
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tv_end_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#F4F4F4"
+            android:padding="12dp"
+            android:text="종료일 선택"
+            android:textColor="#111111" />
+    </LinearLayout>
+
+    <!-- 복용 시간 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="14dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@android:drawable/ic_lock_idle_alarm"
+            app:tint="#8D8D8D" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="시간 (복수 선택 가능)"
+            android:textColor="#000000"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- 수정: RadioGroup → CheckBox 3개로 교체 + 코럴색 적용 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="12dp">
+
+        <CheckBox
+            android:id="@+id/cb_morning"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="아침"
+            android:textColor="#000000"
+            android:buttonTint="#FF786E" />
+
+        <CheckBox
+            android:id="@+id/cb_lunch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="점심"
+            android:textColor="#000000"
+            android:buttonTint="#FF786E" />
+
+        <CheckBox
+            android:id="@+id/cb_dinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="저녁"
+            android:textColor="#000000"
+            android:buttonTint="#FF786E" />
+    </LinearLayout>
+
+</LinearLayout>

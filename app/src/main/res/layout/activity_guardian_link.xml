@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F8F8"
+    android:fitsSystemWindows="true"
+    tools:context=".GuardianLinkActivity">
+
+    <TextView
+        android:id="@+id/tv_guardian_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="보호자 관리"
+        android:textColor="@color/black"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="뒤로가기"
+        android:padding="8dp"
+        android:src="@drawable/ic_arrow_left"
+        app:tint="@color/black"
+        app:layout_constraintTop_toTopOf="@id/tv_guardian_title"
+        app:layout_constraintBottom_toBottomOf="@id/tv_guardian_title"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_guardian"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingStart="20dp"
+        android:paddingTop="18dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="30dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_guardian_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 내 코드 카드 (기존 유지) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_my_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="3dp"
+                app:strokeColor="#EEEEEE"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="내 코드"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_alarm_item_new"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_my_invite_code"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="불러오는 중..."
+                            android:textColor="@color/black"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <ImageButton
+                            android:id="@+id/btn_copy_invite_code"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="사용자 코드 복사"
+                            android:padding="8dp"
+                            android:src="@drawable/baseline_content_copy_24"
+                            app:tint="@color/main_coral" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="보호자에게 내 코드를 공유하세요"
+                        android:textColor="@color/dark_gray"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 연동 요청 카드 (기존 유지) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_request_link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="3dp"
+                app:strokeColor="#EEEEEE"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="보호자 연동"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="보호 받을 사용자 코드를 입력하세요"
+                        android:textColor="@color/dark_gray"
+                        android:textSize="13sp" />
+
+                    <EditText
+                        android:id="@+id/et_invite_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@android:drawable/edit_text"
+                        android:hint="사용자 코드 입력"
+                        android:inputType="textCapCharacters"
+                        android:maxLength="12"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="#A0A0A0" />
+
+                    <LinearLayout
+                        android:id="@+id/btn_request_link"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_guardian_status"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="요청"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 연동 상태 카드 (수락/거절 버튼 추가) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_link_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="3dp"
+                app:strokeColor="#EEEEEE"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="연동 상태"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_protected_user_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="보호 중인 사용자 없음"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_protected_user_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="아직 보낸 요청이 없어요"
+                        android:textColor="@color/dark_gray"
+                        android:textSize="13sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="16dp"
+                        android:background="#EFEFEF" />
+
+                    <TextView
+                        android:id="@+id/tv_my_guardian_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="연동된 보호자 없음"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_my_guardian_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="아직 연결되지 않았어요"
+                        android:textColor="@color/dark_gray"
+                        android:textSize="13sp" />
+
+                    <!-- 추가: 수락/거절 버튼 (PENDING + 내가 patient일 때만 표시) -->
+                    <LinearLayout
+                        android:id="@+id/layout_accept_reject"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <!-- 거절 버튼 -->
+                        <LinearLayout
+                            android:id="@+id/btn_reject_link"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_schedule_done_button_pending"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="거절"
+                                android:textColor="@color/dark_gray"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- 수락 버튼 -->
+                        <LinearLayout
+                            android:id="@+id/btn_accept_link"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_guardian_status"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="수락"
+                                android:textColor="@android:color/white"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/tv_guardian_guide"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:lineSpacingExtra="2dp"
+                android:text="연동이 완료되면 복약 현황 달력을 확인할 수 있어요."
+                android:textColor="@color/dark_gray"
+                android:textSize="13sp" />
+
+            <!-- 추가: 연동 해제 버튼 (ACTIVE 상태일 때만 표시) -->
+            <LinearLayout
+                android:id="@+id/layout_disconnect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/btn_disconnect_link"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_schedule_done_button_pending"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="연동 해제"
+                        android:textColor="#E53935"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

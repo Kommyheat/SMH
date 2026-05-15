@@ -1,0 +1,9 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.SmartMedicationHelper" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorControlActivated">@color/main_coral</item>
+        <item name="android:textCursorDrawable">@drawable/edit_text_cursor_coral</item>
+        <item name="fontFamily">@font/samsungsans_regular</item>
+        <item name="android:fontFamily">@font/samsungsans_regular</item>
+    </style>
+</resources>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
+    android:paddingBottom="500dp">
+
+    <!-- 카드 본체 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_health"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- 헤더: # 오늘의 건강 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="#                         오늘의 건강"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- 구분선 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray"
+                android:layout_marginBottom="16dp" />
+
+            <!-- 복용 시간 아이콘 + 메시지 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_heart_filled"
+                    android:contentDescription="복약"
+                    app:tint="@color/main_coral" />
+
+                <!-- 곧 복용 시간 메시지 -->
+                <TextView
+                    android:id="@+id/tv_upcoming_medicine"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="5dp"
+                    android:text="오늘 복용할 약이 없습니다."
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- X 닫기 버튼: 카드 바깥 하단 중앙에 겹쳐 배치 -->
+    <ImageButton
+        android:id="@+id/btn_close_health"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/bg_alarm_item"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:contentDescription="닫기"
+        android:elevation="10dp"
+        app:tint="@color/black" />
+
+</RelativeLayout>

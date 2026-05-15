@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"
+        tools:ignore="ExactAlarmPolicy" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.SmartMedicationHelper">
+
+
+        <activity android:name=".ChatbotActivity" />
+        <activity android:name=".MyPageActivity" />
+        <activity android:name=".FindIdActivity" />
+        <activity android:name=".FindPasswordActivity" />
+        <activity android:name=".ResetPasswordActivity" />
+        <activity
+            android:name=".SignUpActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".calendar.MedicationCalendarActivity" />
+        <activity android:name=".AlarmSettingsActivity" />
+        <activity android:name=".FontSizeActivity" />
+        <activity android:name=".GuardianLinkActivity" />
+        <activity android:name=".UserProfileActivity" />
+        <activity android:name=".InquiryActivity" />
+
+
+        <receiver
+            android:name=".alarm.MedicationAlarmReceiver"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+</manifest>
