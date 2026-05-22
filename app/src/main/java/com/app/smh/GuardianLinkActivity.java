@@ -3,6 +3,7 @@ package com.app.smh;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.app.smh.auth.AuthApiClient;
+import com.app.smh.calendar.PatientCalendarActivity;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class GuardianLinkActivity extends AppCompatActivity {
@@ -40,12 +43,16 @@ public class GuardianLinkActivity extends AppCompatActivity {
     private String currentUserCode = "";
     private long currentUserId = -1L;
 
-    // 추가: 현재 careLinkId (수락/거절 시 필요)
+    // 현재 careLinkId (수락/거절 시 필요)
     private long currentCareLinkId = -1L;
-    // 추가 : 연동 해제
+    // 연동 해제
     private LinearLayout layoutDisconnect;
     private LinearLayout btnDisconnectLink;
-
+    // 달력 보기
+    private LinearLayout layoutViewPatientCalendar;
+    private LinearLayout btnViewPatientCalendar;
+    private long currentPatientId = -1L;
+    private String currentPatientName = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,13 +88,16 @@ public class GuardianLinkActivity extends AppCompatActivity {
         tvMyGuardianName = findViewById(R.id.tv_my_guardian_name);
         tvMyGuardianStatus = findViewById(R.id.tv_my_guardian_status);
 
-        // 추가 : 수락/거절
+        // 수락/거절
         layoutAcceptReject = findViewById(R.id.layout_accept_reject);
         btnAcceptLink = findViewById(R.id.btn_accept_link);
         btnRejectLink = findViewById(R.id.btn_reject_link);
-        //연동 해제
+        // 연동 해제
         layoutDisconnect = findViewById(R.id.layout_disconnect);
         btnDisconnectLink = findViewById(R.id.btn_disconnect_link);
+        // 달력보기
+        layoutViewPatientCalendar = findViewById(R.id.layout_view_patient_calendar);
+        btnViewPatientCalendar = findViewById(R.id.btn_view_patient_calendar);
     }
 
     private void setupListeners() {
@@ -152,6 +162,18 @@ public class GuardianLinkActivity extends AppCompatActivity {
                     .setPositiveButton("해제", (dialog, which) -> submitDisconnect())
                     .setNegativeButton("취소", null)
                     .show();
+        });
+
+        btnViewPatientCalendar.setOnClickListener(v -> {
+            // 추가: patientId 확인 로그
+            android.util.Log.d("PatientCal", "patientId: " + currentPatientId);
+            android.util.Log.d("PatientCal", "patientName: " + currentPatientName);
+
+            Intent intent = new Intent(GuardianLinkActivity.this,
+                    PatientCalendarActivity.class);
+            intent.putExtra("patientId", currentPatientId);
+            intent.putExtra("patientName", currentPatientName);
+            startActivity(intent);
         });
     }
 
@@ -340,6 +362,11 @@ public class GuardianLinkActivity extends AppCompatActivity {
         // 기본: 수락/거절 버튼 숨기기
         layoutAcceptReject.setVisibility(View.GONE);
 
+        // 모든 케이스 시작 전 피보호자 달력 버튼 숨기기
+        if (layoutViewPatientCalendar != null) {
+            layoutViewPatientCalendar.setVisibility(View.GONE);
+        }
+
         switch (status) {
             case "PENDING":
                 tvProtectedUserName.setText("보호 중인 사용자: " + protectedName);
@@ -364,6 +391,16 @@ public class GuardianLinkActivity extends AppCompatActivity {
                 tvMyGuardianStatus.setText("복약 현황을 함께 확인할 수 있어요");
                 // 추가: 연동 해제 버튼 표시
                 layoutDisconnect.setVisibility(View.VISIBLE);
+
+                // layoutViewPatientCalendar 사용
+                // 내가 보호자(caregiver)일 때만 피보호자 달력 버튼 표시
+                if (response.caregiverId == currentUserId) {
+                    currentPatientId = response.patientId;
+                    currentPatientName = protectedName;
+                    if (layoutViewPatientCalendar != null) {
+                        layoutViewPatientCalendar.setVisibility(View.VISIBLE);
+                    }
+                }
                 break;
 
             case "DISCONNECTED":
@@ -388,6 +425,9 @@ public class GuardianLinkActivity extends AppCompatActivity {
 
     private void renderEmptyState() {
         currentCareLinkId = -1L;
+        // currentPatientId, currentPatientName 초기화
+        currentPatientId = -1L;
+        currentPatientName = "";
         tvProtectedUserName.setText("보호 중인 사용자 없음");
         tvProtectedUserStatus.setText("아직 연동 요청이 없어요");
         tvMyGuardianName.setText("연동된 보호자 없음");
@@ -397,6 +437,10 @@ public class GuardianLinkActivity extends AppCompatActivity {
         }
         if (layoutDisconnect != null) {
             layoutDisconnect.setVisibility(View.GONE);
+        }
+        // 피보호자 달력 버튼 숨기기
+        if (layoutViewPatientCalendar != null) {
+            layoutViewPatientCalendar.setVisibility(View.GONE);
         }
     }
     private void copyUserCode() {

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.app.smh.alarm.AlarmScheduler;
+import com.app.smh.schedule.MedicationServerSync;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 
@@ -103,6 +104,9 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                             SettingsManager.setAlarmMorningTime(this, time24);
                             tvMorningTime.setText(to12HourDisplay(time24));
                             AlarmScheduler.scheduleAll(this);
+
+                            //  서버 스케줄 시간 업데이트
+                            MedicationServerSync.updateScheduleTimeBySlot(this, "MORNING", time24);
                         })
         );
 
@@ -115,6 +119,9 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                             SettingsManager.setAlarmLunchTime(this, time24);
                             tvLunchTime.setText(to12HourDisplay(time24));
                             AlarmScheduler.scheduleAll(this);
+
+                            // 추가: 서버 스케줄 시간 업데이트
+                            MedicationServerSync.updateScheduleTimeBySlot(this, "LUNCH", time24);
                         })
         );
 
@@ -127,6 +134,9 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                             SettingsManager.setAlarmDinnerTime(this, time24);
                             tvDinnerTime.setText(to12HourDisplay(time24));
                             AlarmScheduler.scheduleAll(this);
+
+                            // 추가: 서버 스케줄 시간 업데이트
+                            MedicationServerSync.updateScheduleTimeBySlot(this, "DINNER", time24);
                         })
         );
 
@@ -140,6 +150,8 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                         SettingsManager.setAlarmWakeupTime(this, time24);
                         tvWakeupTime.setText(to12HourDisplay(time24));
                         AlarmScheduler.scheduleAll(this);
+
+                        MedicationServerSync.updateScheduleTimeBySlot(this, "MORNING", time24);
                     });
         });
 

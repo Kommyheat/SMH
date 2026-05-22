@@ -9,13 +9,16 @@ import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
 
 import com.app.smh.R;
 import com.app.smh.schedule.ScheduleMedicineItem;
 import com.app.smh.schedule.ScheduleRepository;
+import com.app.smh.SettingsManager;
+
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -40,6 +43,7 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
 
     private Calendar currentMonthCalendar;
     private Calendar selectedDateCalendar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +147,7 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
         if (items.isEmpty()) return false;
         for (ScheduleMedicineItem item : items) {
             if (!item.isCompletedOn(date)) return false;
+
         }
         return true;
     }
@@ -219,6 +224,7 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
                 tvStatus.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
                 tvStatus.setBackgroundResource(R.drawable.bg_schedule_done_button_pending);
             }
+
 
             detailView.setClickable(true);
             detailView.setFocusable(true);
@@ -349,5 +355,11 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
     private String formatDate(Calendar calendar) {
         return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 .format(calendar.getTime());
+    }
+
+
+    private Long getUserId() {
+        long userId = SettingsManager.getLoginUserId(this);
+        return userId > 0 ? userId : null;
     }
 }

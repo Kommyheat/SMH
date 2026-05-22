@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import com.app.smh.api.ChatbotApiClient;
+
 public class ChatbotActivity extends AppCompatActivity {
 
     private ImageButton btnBackChatbot;
@@ -23,6 +25,8 @@ public class ChatbotActivity extends AppCompatActivity {
 
     private Button btnQTime, btnQSideEffect, btnQInteraction, btnQScanInfo, btnQGuardian;
     private BottomNavigationView bottomNavigationView;
+
+    private final ChatbotApiClient chatbotApiClient = new ChatbotApiClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,38 +52,18 @@ public class ChatbotActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
         bottomNavigationView.setOnItemSelectedListener(item -> true);
 
-        btnQTime.setOnClickListener(v -> setQuestionAndAnswer(
-                "복용 시간 방법",
-                "복용 시간 방법은 식전, 식후, 취침 전 여부를 기준으로 안내할 예정입니다."
-        ));
-
-        btnQSideEffect.setOnClickListener(v -> setQuestionAndAnswer(
-                "부작용",
-                "부작용 정보는 약품별 안내 데이터와 주의사항 정보를 바탕으로 제공할 예정입니다."
-        ));
-
-        btnQInteraction.setOnClickListener(v -> setQuestionAndAnswer(
-                "병용 금지",
-                "병용 금지 정보는 함께 등록된 약 정보를 비교해 주의해야 할 조합을 보여줄 예정입니다."
-        ));
-
-        btnQScanInfo.setOnClickListener(v -> setQuestionAndAnswer(
-                "스캔한 약 상세 설명",
-                "스캔한 약 상세 설명은 OCR 결과와 약품 상세 조회 데이터를 연결해 보여줄 예정입니다."
-        ));
-
-        btnQGuardian.setOnClickListener(v -> setQuestionAndAnswer(
-                "보호자용 상태 요약 보기",
-                "보호자용 상태 요약은 복약 완료 여부와 최근 상태를 정리해 보여줄 예정입니다."
-        ));
+        btnQTime.setOnClickListener(v -> askChatbot("복용 시간 방법"));
+        btnQSideEffect.setOnClickListener(v -> askChatbot("부작용"));
+        btnQInteraction.setOnClickListener(v -> askChatbot("병용 금지"));
+        btnQScanInfo.setOnClickListener(v -> askChatbot("스캔한 약 상세 설명"));
+        btnQGuardian.setOnClickListener(v -> askChatbot("보호자용 상태 요약 보기"));
 
         btnSendChat.setOnClickListener(v -> {
             String input = etChatInput.getText().toString().trim();
 
             if (!input.isEmpty()) {
-                tvUserQuestion.setText(input);
-                tvChatbotResponse.setText("입력한 질문에 대한 AI 상담 기능은 이후 연결될 예정입니다.");
                 etChatInput.setText("");
+                askChatbot(input);
             }
 
             hideKeyboard();
@@ -87,11 +71,9 @@ public class ChatbotActivity extends AppCompatActivity {
         });
     }
 
+
     private void setQuestionAndAnswer(String question, String answer) {
-        tvUserQuestion.setText(question);
-        tvChatbotResponse.setText(answer);
-        hideKeyboard();
-        etChatInput.clearFocus();
+        askChatbot(question);
     }
 
     private void hideKeyboard() {
@@ -103,5 +85,33 @@ public class ChatbotActivity extends AppCompatActivity {
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         }
+    }
+
+    private void askChatbot(String question) {
+        tvUserQuestion.setText(question);
+        tvChatbotResponse.setText("답변을 불러오는 중입니다...");
+
+        new Thread(() -> {
+            try {
+                ChatbotApiClient.ChatbotResponse response =
+                        chatbotApiClient.sendMessage(new ChatbotApiClient.ChatbotRequest(question));
+
+                runOnUiThread(() -> {
+                    if (response != null && response.answer != null && !response.answer.trim().isEmpty()) {
+                        tvChatbotResponse.setText(response.answer);
+                    } else {
+                        tvChatbotResponse.setText("응답을 가져오지 못했습니다.");
+                    }
+                });
+
+            } catch (Exception e) {
+                runOnUiThread(() ->
+                        tvChatbotResponse.setText("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.")
+                );
+            }
+        }).start();
+
+        hideKeyboard();
+        etChatInput.clearFocus();
     }
 }

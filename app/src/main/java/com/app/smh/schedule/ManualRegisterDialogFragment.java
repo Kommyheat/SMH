@@ -52,7 +52,7 @@ public class ManualRegisterDialogFragment extends DialogFragment {
         EditText etCategoryName = view.findViewById(R.id.et_category_name);
         EditText etDrugNames = view.findViewById(R.id.et_drug_names);
 
-        // 수정: RadioGroup → CheckBox 3개로 교체
+        // RadioGroup → CheckBox 3개로 교체
         CheckBox cbMorning = view.findViewById(R.id.cb_morning);
         CheckBox cbLunch = view.findViewById(R.id.cb_lunch);
         CheckBox cbDinner = view.findViewById(R.id.cb_dinner);
@@ -75,7 +75,7 @@ public class ManualRegisterDialogFragment extends DialogFragment {
                 })
         );
 
-        // 수정: 버튼 색상 코럴색으로 변경
+        // 버튼 색상 코럴색으로 변경
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("수기 등록")
                 .setView(view)
@@ -100,7 +100,7 @@ public class ManualRegisterDialogFragment extends DialogFragment {
                         String categoryName = etCategoryName.getText().toString().trim();
                         String drugNamesRaw = etDrugNames.getText().toString().trim();
 
-                        // 수정: 다중 선택된 시간대 수집
+                        // 다중 선택된 시간대 수집
                         ArrayList<String> selectedTimeSlots = new ArrayList<>();
                         if (cbMorning.isChecked()) selectedTimeSlots.add("아침");
                         if (cbLunch.isChecked()) selectedTimeSlots.add("점심");
@@ -138,7 +138,9 @@ public class ManualRegisterDialogFragment extends DialogFragment {
                             }
                         }
 
-                        // 수정: 선택된 시간대별로 각각 ScheduleMedicineItem 생성 및 저장
+                        // savedItems 리스트 추가 후 서버 동기화
+                        ArrayList<ScheduleMedicineItem> savedItems = new ArrayList<>();
+
                         for (String timeSlot : selectedTimeSlots) {
                             ScheduleMedicineItem item = new ScheduleMedicineItem();
                             item.setCategoryName(categoryName);
@@ -148,8 +150,14 @@ public class ManualRegisterDialogFragment extends DialogFragment {
                             item.setTimeSlot(timeSlot);
                             item.setCompleted(false);
 
+                            // 기존: 로컬 저장 (유지)
                             ScheduleRepository.addSchedule(requireContext(), item);
+                            savedItems.add(item); // 추가
                         }
+
+
+                        // 추가: 서버 저장 (비동기, 실패해도 영향 없음)
+                        MedicationServerSync.syncToServer(requireContext(), savedItems);
 
                         Toast.makeText(requireContext(),
                                 "복약 일정이 등록되었습니다.", Toast.LENGTH_SHORT).show();

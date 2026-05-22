@@ -28,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.app.smh.auth.AuthApiClient;
+import com.app.smh.schedule.MedicationServerSync;
 import com.app.smh.schedule.ScheduleRepository;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -144,7 +145,7 @@ public class LoginActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     // 로그인 세션 저장 (기존 유지)
                     SettingsManager.saveLoginSession(this, response.id, response.loginId, response.name);
-                    // 추가
+
                     if (response.birthDate != null) {
                         SettingsManager.setBirthDate(this, response.birthDate);
                     }
@@ -160,9 +161,8 @@ public class LoginActivity extends AppCompatActivity {
 
                     Toast.makeText(this, response.name + "님, 환영합니다.", Toast.LENGTH_SHORT).show();
 
-                    // 로그인 성공 후 서버에서 복약 스케줄 동기화 후 메인으로 이동
-                    // 서버 API 미준비 또는 실패해도 onComplete는 항상 호출됨
-                    ScheduleRepository.syncFromServer(this, () ->
+                    // 서버에서 복약 스케줄 불러와서 로컬 동기화 후 메인으로 이동
+                    MedicationServerSync.syncFromServer(this, () ->
                             runOnUiThread(() -> {
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                 finish();

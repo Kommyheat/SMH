@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
+import com.app.smh.schedule.IntakeServerSync;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
@@ -26,7 +28,9 @@ import com.app.smh.alarm.MedicationAlarmReceiver;
 import com.app.smh.calendar.MedicationCalendarActivity;
 import com.app.smh.health.TodayHealthManager;
 import com.app.smh.scan.ScanCameraFragment;
+
 import com.app.smh.schedule.ManualRegisterDialogFragment;
+import com.app.smh.schedule.MedicationServerSync;
 import com.app.smh.schedule.ScheduleMedicineItem;
 import com.app.smh.schedule.ScheduleRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -36,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
     private View dimOverlay;
     private View todayHealthPanel;
     private boolean isHealthPanelVisible = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, MedicationCalendarActivity.class)));
     }
 
-    // ─── 오늘의 건강 패널 ────────────────────────────────
+    // 오늘의 건강 패널
     private void setupHealthButton() {
         ImageView ivFavorite = findViewById(R.id.iv_favorite);
         if (ivFavorite == null) return;
@@ -387,11 +394,29 @@ public class MainActivity extends AppCompatActivity {
 
             if (btnTakeDone != null) {
                 btnTakeDone.setOnClickListener(v -> {
-                    //  선택된 날짜의 완료 상태만 토글
                     boolean current = item.isCompletedOn(currentDate);
                     item.setCompletedOn(currentDate, !current);
                     ScheduleRepository.updateCompletedForDate(this, item, currentDate);
                     updateTakeButtonStyle(foreground, btnTakeDone, !current);
+
+                    // 추가: 서버 intake_logs 동기화
+                    if (!current) {
+                        // 미완료 → 완료
+                        IntakeServerSync.syncTaken(
+                                this,
+                                item.getCategoryName(),
+                                item.getTimeSlot(),
+                                currentDate
+                        );
+                    } else {
+                        // 완료 → 미완료
+                        IntakeServerSync.syncCanceled(
+                                this,
+                                item.getCategoryName(),
+                                item.getTimeSlot(),
+                                currentDate
+                        );
+                    }
                 });
             }
 
@@ -508,6 +533,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
+        // setupSwipeToDelete() 안의 삭제 버튼 클릭
         if (deleteBtn != null) {
             deleteBtn.setOnClickListener(v ->
                     new MaterialAlertDialogBuilder(this)
@@ -515,8 +541,12 @@ public class MainActivity extends AppCompatActivity {
                             .setMessage("'" + item.getCategoryName() + "' 복약 일정을 삭제할까요?")
                             .setNegativeButton("취소", (dialog, which) -> closeSwipe(foreground))
                             .setPositiveButton("삭제", (dialog, which) -> {
-                                ScheduleRepository.removeSchedule(this, item);
-                                renderScheduleForSelectedDate();
+                                // 수정: 기존 로컬 삭제 → 서버+로컬 동시 삭제
+                                MedicationServerSync.deleteMedication(
+                                        this,
+                                        item,
+                                        () -> renderScheduleForSelectedDate()
+                                );
                             })
                             .show()
             );

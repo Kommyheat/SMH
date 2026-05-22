@@ -6,6 +6,10 @@ aws:
   region: ${AWS_REGION:ap-northeast-2}
   ses:
     from-email: ${SES_FROM_EMAIL:no-reply@smh.quest}
+
+openai:
+  api-key: ${OPENAI_API_KEY}
+  model: gpt-4.1-mini
 ---
 spring:
   config:

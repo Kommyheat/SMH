@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="감기약"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/dark_gray"
             android:textSize="16sp"
             android:textStyle="bold" />
 

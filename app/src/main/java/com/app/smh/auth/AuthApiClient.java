@@ -10,6 +10,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class AuthApiClient {
@@ -341,4 +342,234 @@ public class AuthApiClient {
         public String birthDate;
         public String email;
     }
+
+
+    // 약 등록
+    public Long createMedication(MedicationSaveRequest request) throws IOException, ApiException {
+        String body = gson.toJson(request);
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/medications")
+                .post(RequestBody.create(body, JSON))
+                .build();
+        String response = execute(httpRequest);
+        return gson.fromJson(response, Long.class);
+    }
+
+    // 스케줄 등록
+    public Long createSchedule(ScheduleSaveRequest request) throws IOException, ApiException {
+        String body = gson.toJson(request);
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/schedules")
+                .post(RequestBody.create(body, JSON))
+                .build();
+        String response = execute(httpRequest);
+        return gson.fromJson(response, Long.class);
+    }
+
+    // DTO 추가
+    public static class MedicationSaveRequest {
+        public Long userId;
+        public String medicationName;
+        public String ingredient;
+        public String purpose;
+        public String startDate;
+        public String endDate;
+    }
+
+    public static class ScheduleSaveRequest {
+        public Long userId;
+        public Long medicationId;
+        public String timeSlot;
+        public String scheduledTime;
+        public double quantity;
+        public String unit;
+        public boolean notificationEnabled;
+    }
+
+    // 사용자 스케줄 목록 조회
+    public List<MedicationScheduleResponse> getSchedulesByUser(long userId)
+            throws IOException, ApiException {
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/schedules/user/" + userId)
+                .get()
+                .build();
+        String response = execute(httpRequest);
+        java.lang.reflect.Type type = new com.google.gson.reflect.TypeToken<
+                List<MedicationScheduleResponse>>(){}.getType();
+        return gson.fromJson(response, type);
+    }
+
+    // 복약 완료 기록
+    public void takeMedication(long scheduleId, IntakeTakeRequest request)
+            throws IOException, ApiException {
+        String body = gson.toJson(request);
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/intakes/" + scheduleId + "/take")
+                .post(RequestBody.create(body, JSON))
+                .build();
+        execute(httpRequest);
+    }
+
+    // 복약 완료 취소
+    public void cancelTake(long scheduleId, IntakeTakeRequest request)
+            throws IOException, ApiException {
+        String body = gson.toJson(request);
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/intakes/" + scheduleId + "/cancel")
+                .post(RequestBody.create(body, JSON))
+                .build();
+        execute(httpRequest);
+    }
+
+    // DTO 추가
+    public static class MedicationScheduleResponse {
+        public long id;           // scheduleId
+        public long medicationId;
+        public String medicationName;
+        public String timeSlot;   // MORNING, LUNCH, DINNER, BEDTIME
+        public String scheduledTime;
+        public double quantity;
+        public String unit;
+        public boolean notificationEnabled;
+    }
+
+    public static class IntakeTakeRequest {
+        public long userId;
+        public String date;  // "yyyy-MM-dd"
+        public String memo;
+    }
+
+    // 피보호자 오늘 복약 현황 (보호자용)
+    public PatientIntakeStatusResponse getPatientIntakeStatus(
+            long caregiverId, long patientId) throws IOException, ApiException {
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/api/patients/" + patientId
+                        + "/intake-status?caregiverId=" + caregiverId)
+                .get()
+                .build();
+        String response = execute(httpRequest);
+        return gson.fromJson(response, PatientIntakeStatusResponse.class);
+    }
+
+    // 피보호자 월별 복약 기록 (보호자용)
+    public List<IntakeLogResponse> getPatientMonthlyLogs(
+            long patientId, int year, int month) throws IOException, ApiException {
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/intakes/users/" + patientId
+                        + "/monthly?year=" + year + "&month=" + month)
+                .get()
+                .build();
+        String response = execute(httpRequest);
+        java.lang.reflect.Type type = new com.google.gson.reflect.TypeToken<
+                List<IntakeLogResponse>>(){}.getType();
+        return gson.fromJson(response, type);
+    }
+
+    // DTO 추가
+    public static class PatientIntakeStatusResponse {
+        public long patientId;
+        public String patientName;
+        public List<IntakeItemResponse> IntakeLogs;
+    }
+
+    public static class IntakeItemResponse {
+        public String medicationName;
+        public String scheduledTime;
+        public String status;   // TAKEN, SCHEDULED, MISSED
+        public String takenAt;
+        public String memo;
+        public double quantity;
+        public String unit;
+    }
+
+    public static class IntakeLogResponse {
+        public long intakeLogId;
+        public long scheduleId;
+        public long medicationId;
+        public String medicationName;
+        public String date;
+        public String scheduledTime;
+        public String timeSlot;
+        public double quantity;
+        public String unit;
+        public String status;   // TAKEN, SCHEDULED, MISSED
+        public String takenAt;
+        public String memo;
+    }
+
+    // 사용자 약 목록 조회
+    public List<MedicationResponse> getMedicationsByUser(long userId)
+            throws IOException, ApiException {
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/medications/user/" + userId)
+                .get()
+                .build();
+        String response = execute(httpRequest);
+        java.lang.reflect.Type type = new com.google.gson.reflect.TypeToken<
+                List<MedicationResponse>>(){}.getType();
+        return gson.fromJson(response, type);
+    }
+
+    public static class MedicationResponse {
+        public long id;
+        public String medicationName;
+        public String ingredient;
+        public String purpose;
+        public String startDate;
+        public String endDate;
+        public String status;
+    }
+
+    // 약 상태 변경 (ACTIVE → STOPPED)
+    public void changeMedicationStatus(long medicationId, long userId, String status)
+            throws IOException, ApiException {
+        MedicationStatusChangeRequest request = new MedicationStatusChangeRequest();
+        request.userId = userId;
+        request.status = status;
+
+        String body = gson.toJson(request);
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/medications/" + medicationId + "/status")
+                .patch(RequestBody.create(body, JSON))
+                .build();
+        execute(httpRequest);
+    }
+
+    // DTO 추가
+    public static class MedicationStatusChangeRequest {
+        public Long userId;
+        public String status;
+    }
+
+    // 스케줄 시간 업데이트
+    public void updateScheduleTime(long scheduleId, long userId, String scheduledTime)
+            throws IOException, ApiException {
+
+        ScheduleTimeUpdateRequest request = new ScheduleTimeUpdateRequest();
+        request.userId = userId;
+        request.scheduledTime = scheduledTime;
+        // 기존 값 유지용 더미값
+        request.timeSlot = null;
+        request.quantity = 1.0;
+        request.unit = "정";
+        request.notificationEnabled = true;
+
+        String body = gson.toJson(request);
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/schedules/" + scheduleId)
+                .put(RequestBody.create(body, JSON))
+                .build();
+        execute(httpRequest);
+    }
+
+    public static class ScheduleTimeUpdateRequest {
+        public Long userId;
+        public Long medicationId;
+        public String timeSlot;
+        public String scheduledTime;
+        public double quantity;
+        public String unit;
+        public boolean notificationEnabled;
+    }
+
 }

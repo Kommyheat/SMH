@@ -13,16 +13,20 @@ public class ScheduleMedicineItem {
     private String endDate;
     private String timeSlot;
 
-    // 하위 호환용 (기존 코드와 충돌 방지)
+    // 하위 호환용
     private boolean completed;
 
-    // 추가: 날짜별 완료 상태 (key: "yyyy-MM-dd", value: true/false)
+    // 날짜별 완료 상태 (key: "yyyy-MM-dd", value: true/false)
     private Map<String, Boolean> completedDates;
 
     // 스캔 시 가져온 약품별 상세정보
     private List<DrugDetail> drugDetails;
+    // intake
+    private Long scheduleId;
+
 
     public ScheduleMedicineItem() {
+        this.scheduleId = null;
         this.categoryName = "";
         this.drugNames = new ArrayList<>();
         this.startDate = "";
@@ -89,7 +93,7 @@ public class ScheduleMedicineItem {
         if (date != null) completedDates.put(date, isCompleted);
     }
 
-    // 추가: completedDates getter/setter (Gson 직렬화용)
+    // completedDates getter/setter (Gson 직렬화용)
     public Map<String, Boolean> getCompletedDates() {
         return completedDates != null ? completedDates : new HashMap<>();
     }
@@ -127,5 +131,13 @@ public class ScheduleMedicineItem {
         public boolean hasDetail() {
             return itemName != null && !itemName.isEmpty() && !"-".equals(itemName);
         }
+    }
+
+    public Long getScheduleId() {
+        return scheduleId;
+    }
+
+    public void setScheduleId(Long scheduleId) {
+        this.scheduleId = scheduleId;
     }
 }

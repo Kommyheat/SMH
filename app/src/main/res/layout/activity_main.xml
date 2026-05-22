@@ -358,7 +358,7 @@
                         android:layout_height="51dp"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="8dp"
-                        android:background="@drawable/bg_schedule_done_button_pending"
+                        android:background="#FFFFFF"
                         android:src="@android:drawable/ic_input_add"
                         android:contentDescription="복약 추가"
                         app:tint="@color/dark_gray" />

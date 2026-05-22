@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.smh.MainActivity;
 import com.app.smh.R;
+import com.app.smh.schedule.MedicationServerSync;
 import com.app.smh.schedule.ScheduleMedicineItem;
 import com.app.smh.schedule.ScheduleRepository;
+import com.app.smh.schedule.MedicationServerSync;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -183,6 +185,9 @@ public class ScanGroupRegisterFragment extends Fragment {
         }
 
         ScheduleRepository.addSchedules(requireContext(), scheduleItems);
+
+        // 추가: 서버 저장 (비동기, 실패해도 영향 없음)
+        MedicationServerSync.syncToServer(requireContext(), scheduleItems);
 
         // 등록 완료 후 캐시 초기화
         DrugDetailCache.getInstance().clear();

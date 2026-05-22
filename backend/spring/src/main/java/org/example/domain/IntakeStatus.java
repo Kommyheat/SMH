@@ -6,6 +6,6 @@ public enum IntakeStatus {
 
     SCHEDULED, // 복용예정
     TAKEN,     // 복용 완료
-    MISSED     // 미복용
-
+    MISSED,     // 미복용
+    DELETED   // 삭제됨
 }

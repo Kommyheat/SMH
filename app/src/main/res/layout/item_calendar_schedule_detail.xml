@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="감기약"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/dark_gray"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="아침"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/dark_gray"
             android:textSize="12sp" />
     </LinearLayout>
 

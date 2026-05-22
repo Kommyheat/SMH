@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 
 import com.app.smh.auth.AuthApiClient;
+import com.app.smh.schedule.ScheduleRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -236,6 +237,7 @@ public class MyPageActivity extends AppCompatActivity {
                 SettingsManager.clearDeveloperAutoLogin(this);
                 SettingsManager.clearLoginSession(this);
                 Toast.makeText(this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+                ScheduleRepository.clearAll(this);
                 startActivity(new Intent(MyPageActivity.this, LoginActivity.class));
                 finish();
             } else {

@@ -276,4 +276,24 @@ public class SettingsManager {
     public static String getProfileImagePath(Context context) {
         return getPrefs(context).getString(KEY_PROFILE_IMAGE_PATH, null);
     }
+
+    // timeSlot에 따라 알림 설정 시간 자동 적용
+    private static String getScheduledTime(Context context, String timeSlot) {
+        switch (timeSlot) {
+            case "아침":
+                String morning = SettingsManager.getAlarmMorningTime(context);
+                return morning != null ? morning + ":00" : "08:00:00";
+            case "점심":
+                String lunch = SettingsManager.getAlarmLunchTime(context);
+                return lunch != null ? lunch + ":00" : "12:00:00";
+            case "저녁":
+                String dinner = SettingsManager.getAlarmDinnerTime(context);
+                return dinner != null ? dinner + ":00" : "18:00:00";
+            case "취침 전":
+                String bedtime = SettingsManager.getAlarmBedtimeTime(context);
+                return bedtime != null ? bedtime + ":00" : "21:30:00";
+            default:
+                return "00:00:00";
+        }
+    }
 }

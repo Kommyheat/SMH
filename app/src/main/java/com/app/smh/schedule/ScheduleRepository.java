@@ -123,4 +123,44 @@ public class ScheduleRepository {
                 .putString(KEY_SCHEDULES, json)
                 .apply();
     }
+
+    public static void updateScheduleId(Context context,
+                                        ScheduleMedicineItem targetItem,
+                                        Long scheduleId) {
+        if (targetItem == null || scheduleId == null) return;
+
+        ArrayList<ScheduleMedicineItem> all = getAllSchedules(context);
+        boolean updated = false;
+
+        for (ScheduleMedicineItem item : all) {
+            if (item == null) continue;
+
+            boolean matched =
+                    java.util.Objects.equals(item.getCategoryName(), targetItem.getCategoryName()) &&
+                            java.util.Objects.equals(item.getStartDate(), targetItem.getStartDate()) &&
+                            java.util.Objects.equals(item.getEndDate(), targetItem.getEndDate()) &&
+                            java.util.Objects.equals(item.getTimeSlot(), targetItem.getTimeSlot());
+
+            Log.d("ScheduleRepository", "비교중 item="
+                    + item.getCategoryName()
+                    + ", startDate=" + item.getStartDate()
+                    + ", endDate=" + item.getEndDate()
+                    + ", timeSlot=" + item.getTimeSlot()
+                    + ", matched=" + matched);
+
+            if (matched) {
+                item.setScheduleId(scheduleId);
+                updated = true;
+                Log.d("ScheduleRepository", "scheduleId 반영 성공: " + scheduleId);
+                break;
+            }
+        }
+
+        if (updated) {
+            saveLocal(context, all);
+            Log.d("ScheduleRepository", "saveLocal 완료");
+        } else {
+            Log.d("ScheduleRepository", "일치 항목 없음 → scheduleId 저장 실패");
+        }
+    }
 }

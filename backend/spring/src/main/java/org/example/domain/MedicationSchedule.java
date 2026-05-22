@@ -22,6 +22,10 @@ public class MedicationSchedule {
     @JoinColumn(name = "medication_id", nullable = false)
     private Medication medication;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private TimeSlot timeSlot;
+
     @Column(nullable = false)
     private LocalTime scheduledTime;   // 복용 시간
 
@@ -34,19 +38,32 @@ public class MedicationSchedule {
     @Column(nullable = false)
     private boolean notificationEnabled; // 알림 사용 여부
 
-    public MedicationSchedule(Medication medication, LocalTime scheduledTime,
-                              double quantity, String unit, boolean notificationEnabled) {
-        validate(medication, scheduledTime, quantity, unit);
+    public MedicationSchedule(
+            Medication medication,
+            TimeSlot timeSlot,
+            LocalTime scheduledTime,
+            double quantity,
+            String unit,
+            boolean notificationEnabled
+    ) {
+        validate(medication, timeSlot, scheduledTime, quantity, unit);
         this.medication = medication;
+        this.timeSlot = timeSlot;
         this.scheduledTime = scheduledTime;
         this.quantity = quantity;
         this.unit = unit;
         this.notificationEnabled = notificationEnabled;
     }
 
-    public void updateSchedule(LocalTime scheduledTime, double quantity,
-                               String unit, boolean notificationEnabled) {
-        validate(medication, scheduledTime, quantity, unit);
+    public void updateSchedule(
+            TimeSlot timeSlot,
+            LocalTime scheduledTime,
+            double quantity,
+            String unit,
+            boolean notificationEnabled
+    ) {
+        validate(this.medication, timeSlot, scheduledTime, quantity, unit);
+        this.timeSlot = timeSlot;
         this.scheduledTime = scheduledTime;
         this.quantity = quantity;
         this.unit = unit;
@@ -57,10 +74,18 @@ public class MedicationSchedule {
         this.notificationEnabled = notificationEnabled;
     }
 
-    //오류 검증
-    private void validate(Medication medication, LocalTime scheduledTime, double quantity, String unit) {
+    private void validate(
+            Medication medication,
+            TimeSlot timeSlot,
+            LocalTime scheduledTime,
+            double quantity,
+            String unit
+    ) {
         if (medication == null) {
             throw new IllegalArgumentException("복약 스케줄에 연결된 약 정보는 필수입니다.");
+        }
+        if (timeSlot == null) {
+            throw new IllegalArgumentException("복용 시간대는 필수입니다.");
         }
         if (scheduledTime == null) {
             throw new IllegalArgumentException("복용 시간은 필수입니다.");

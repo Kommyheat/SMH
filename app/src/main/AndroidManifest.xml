@@ -40,6 +40,7 @@
         <activity android:name=".GuardianLinkActivity" />
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".InquiryActivity" />
+        <activity android:name=".calendar.PatientCalendarActivity" />
 
 
         <receiver

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.app.smh.schedule.MedicationServerSync;
 import com.app.smh.schedule.ScheduleRepository;
 
 public class SplashActivity extends AppCompatActivity {
@@ -36,7 +37,7 @@ public class SplashActivity extends AppCompatActivity {
             return;
         }
 
-        // 로고 드롭 + 회전 + 페이드인 애니메이션 (기존 유지)
+        // 로고 드롭 + 회전 + 페이드인 애니메이션
         ObjectAnimator drop = ObjectAnimator.ofFloat(logo, "translationY", -1200f, 0f);
         ObjectAnimator rotate = ObjectAnimator.ofFloat(logo, "rotation", -20f, 0f);
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(logo, "alpha", 0f, 1f);
@@ -47,7 +48,7 @@ public class SplashActivity extends AppCompatActivity {
         animSet.setInterpolator(new BounceInterpolator());
         animSet.start();
 
-        // 타이틀 슬라이드 + 회전 + 페이드인 애니메이션 (기존 유지)
+        // 타이틀 슬라이드 + 회전 + 페이드인 애니메이션
         ObjectAnimator textSlide = ObjectAnimator.ofFloat(title, "translationX", -900f, 0f);
         ObjectAnimator textRoll = ObjectAnimator.ofFloat(title, "rotation", -720f, 0f);
         ObjectAnimator textFadeIn = ObjectAnimator.ofFloat(title, "alpha", 0f, 1f);
@@ -64,17 +65,15 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void goToNext() {
-        // SettingsManager에서 저장된 userId로 로그인 상태 확인
         if (SettingsManager.isLoggedIn(this)) {
-            // 로그인 상태 → 서버에서 복약 스케줄 동기화 후 메인화면으로 이동
-            ScheduleRepository.syncFromServer(this, () ->
+            // 서버에서 복약 스케줄 동기화 후 메인으로
+            MedicationServerSync.syncFromServer(this, () ->
                     runOnUiThread(() -> {
                         startActivity(new Intent(this, MainActivity.class));
                         finish();
                     })
             );
         } else {
-            // 로그인 정보 없음 → 로그인 화면으로 이동 (기존 동작 유지)
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         }
