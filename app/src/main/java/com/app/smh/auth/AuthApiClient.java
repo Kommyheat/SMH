@@ -202,6 +202,21 @@ public class AuthApiClient {
         }
     }
 
+    public void deleteMedicationByTimeSlot(long medicationId, long userId, String timeSlot)
+            throws IOException, ApiException {
+        String url = baseUrl + "/medications/" + medicationId
+                + "?userId=" + userId
+                + "&timeSlot=" + timeSlot;
+
+        android.util.Log.d("DeleteAPI", "호출 URL: " + url);  // 추가
+
+        Request httpRequest = new Request.Builder()
+                .url(url)
+                .delete()
+                .build();
+        execute(httpRequest);
+    }
+
     public static class ApiException extends Exception {
         public ApiException(String message) {
             super(message);
@@ -290,13 +305,11 @@ public class AuthApiClient {
         public String linkCode;
     }
 
-    // guardian-links 가정 DTO에서 실제 DB 구조인 care_links 기준 DTO로 명칭 변경
     public static class CareLinkRequest {
         public long caregiverId;
         public String patientUserCode;
     }
 
-    // linkRequestId가 아니라 care_links.id를 직접 다루므로 careLinkId로 변경
     public static class CareLinkDecisionRequest {
         public long patientId;
         public long careLinkId;
@@ -456,6 +469,20 @@ public class AuthApiClient {
             long patientId, int year, int month) throws IOException, ApiException {
         Request httpRequest = new Request.Builder()
                 .url(baseUrl + "/intakes/users/" + patientId
+                        + "/monthly?year=" + year + "&month=" + month)
+                .get()
+                .build();
+        String response = execute(httpRequest);
+        java.lang.reflect.Type type = new com.google.gson.reflect.TypeToken<
+                List<IntakeLogResponse>>(){}.getType();
+        return gson.fromJson(response, type);
+    }
+
+    // 본인 월별 복약 기록 조회
+    public List<IntakeLogResponse> getMyMonthlyLogs(long userId, int year, int month)
+            throws IOException, ApiException {
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/intakes/users/" + userId
                         + "/monthly?year=" + year + "&month=" + month)
                 .get()
                 .build();

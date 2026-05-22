@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -17,7 +18,7 @@
         android:layout_marginBottom="16dp"
         android:background="#DDDDDD" />
 
-    <!-- 카테고리명 (예: 감기약) -->
+    <!-- 카테고리명 -->
     <TextView
         android:id="@+id/tv_bs_drug_name"
         android:layout_width="match_parent"
@@ -43,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#F0F0F0"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="14dp" />
 
     <!-- 로딩 스피너 -->
     <ProgressBar
@@ -64,7 +65,17 @@
         android:textSize="14sp"
         android:visibility="gone" />
 
-    <!-- 약품별 상세정보 목록 (동적으로 추가) -->
+    <!-- 약품명 Chip 버튼 목록 -->
+    <com.google.android.material.chip.ChipGroup
+    android:id="@+id/chip_group_drugs"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    android:visibility="gone"
+    app:singleSelection="true"
+    app:selectionRequired="false" />
+
+    <!-- 선택된 약품 상세정보 -->
     <ScrollView
         android:id="@+id/scroll_bs_detail"
         android:layout_width="match_parent"
@@ -79,4 +90,76 @@
 
     </ScrollView>
 
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#F0F0F0"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 메모 라벨 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="메모"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 메모 입력 카드 -->
+    <com.google.android.material.card.MaterialCardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
+
+    <EditText
+        android:id="@+id/et_bs_memo"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@android:color/transparent"
+        android:gravity="top"
+        android:hint="현재 상태를 입력하세요."
+        android:padding="12dp"
+        android:textColorHint="#AAAAAA"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:inputType="textMultiLine"
+        android:maxLines="3"
+        android:cursorVisible="true"/>
+
+</com.google.android.material.card.MaterialCardView>
+
+    <!-- 메모 저장 버튼 (초기 숨김, 텍스트 입력 시 표시) -->
+<LinearLayout
+android:id="@+id/btn_bs_save_memo"
+android:layout_width="wrap_content"
+android:layout_height="36dp"
+android:layout_marginTop="8dp"
+android:layout_gravity="end"
+android:background="@drawable/bg_guardian_status"
+android:clickable="true"
+android:focusable="true"
+android:foreground="?attr/selectableItemBackground"
+android:gravity="center"
+android:paddingStart="16dp"
+android:paddingEnd="16dp"
+android:orientation="horizontal"
+android:visibility="gone">
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="메모 저장"
+    android:textColor="@android:color/white"
+    android:textSize="13sp"
+    android:textStyle="bold" />
+
 </LinearLayout>
+
+    </LinearLayout>

@@ -181,13 +181,8 @@ public class ScanCameraFragment extends Fragment {
         pickImageLauncher.launch("image/*");
     }
 
-    /**
-     * 카메라 촬영 / 갤러리 선택 결과를 한 군데로 모아서 처리하는 함수
-     *
-     * @param source "camera" 또는 "gallery"
-     * @param imageUri 선택/촬영된 이미지 Uri
-     * @param imageFile 카메라 촬영일 때만 File 객체, 갤러리 선택은 null
-     */
+
+     // 카메라 촬영 / 갤러리 선택 결과를 한 군데로 모아서 처리하는 함수
     private void processSelectedImage(String source, Uri imageUri, @Nullable File imageFile) {
         showLoading(false);
 

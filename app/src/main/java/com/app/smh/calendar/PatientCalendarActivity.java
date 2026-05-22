@@ -46,7 +46,6 @@ public class PatientCalendarActivity extends AppCompatActivity {
     private AuthApiClient authApiClient;
 
     // 서버에서 받은 월별 복약 기록 캐시
-    // key: "yyyy-MM-dd", value: List<IntakeLogResponse>
     private final Map<String, List<AuthApiClient.IntakeLogResponse>> intakeLogMap = new HashMap<>();
 
     @Override
@@ -94,9 +93,7 @@ public class PatientCalendarActivity extends AppCompatActivity {
         layoutDetailList = findViewById(R.id.layout_detail_list);
     }
 
-    /**
-     * 서버에서 해당 월 피보호자 복약 기록 로드
-     */
+    // 서버에서 해당 월 피보호자 복약 기록 로드
     private void loadMonthlyData() {
         int year = currentMonthCalendar.get(Calendar.YEAR);
         int month = currentMonthCalendar.get(Calendar.MONTH) + 1;
@@ -267,9 +264,8 @@ public class PatientCalendarActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * 서버 TimeSlot → 한글 변환
-     */
+
+    // 서버 TimeSlot → 한글 변환
     private String toKoreanTimeSlot(String timeSlot) {
         if (timeSlot == null) return "";
         switch (timeSlot) {

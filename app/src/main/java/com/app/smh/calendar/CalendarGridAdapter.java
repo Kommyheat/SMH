@@ -70,7 +70,6 @@ public class CalendarGridAdapter extends BaseAdapter {
         CalendarDayItem item = items.get(position);
         Context context = parent.getContext();
 
-        // [수정 이유] GridView 재사용 시 이전 셀의 배경/활성상태가 남지 않도록 기본 상태를 먼저 초기화
         tvDay.setText("");
         tvDay.setBackgroundResource(0);
         tvDay.setTextColor(ContextCompat.getColor(context, android.R.color.black));

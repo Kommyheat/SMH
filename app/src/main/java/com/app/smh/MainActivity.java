@@ -1,23 +1,20 @@
 package com.app.smh;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.util.Log;
-import com.app.smh.schedule.IntakeServerSync;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
@@ -28,7 +25,7 @@ import com.app.smh.alarm.MedicationAlarmReceiver;
 import com.app.smh.calendar.MedicationCalendarActivity;
 import com.app.smh.health.TodayHealthManager;
 import com.app.smh.scan.ScanCameraFragment;
-
+import com.app.smh.schedule.IntakeServerSync;
 import com.app.smh.schedule.ManualRegisterDialogFragment;
 import com.app.smh.schedule.MedicationServerSync;
 import com.app.smh.schedule.ScheduleMedicineItem;
@@ -39,46 +36,64 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Locale;
-
 
 public class MainActivity extends AppCompatActivity {
 
     private AppCompatImageButton fabChatbot;
     private BottomNavigationView bottomNavigationView;
     private TextView tvBannerMessage;
-
     private View mainScroll;
     private FrameLayout fragmentContainer;
-
     private TextView tvSelectedDate;
     private ImageButton btnPrevDate;
     private ImageButton btnNextDate;
-
     private LinearLayout layoutMorningMedicineList;
     private LinearLayout layoutLunchMedicineList;
     private LinearLayout layoutDinnerMedicineList;
-
     private TextView tvEmptyMorning;
     private TextView tvEmptyLunch;
     private TextView tvEmptyDinner;
-
     private Calendar selectedCalendar;
     private ImageButton btnCalendar;
-
-    // 오늘의 건강 패널 관련 필드
     private View dimOverlay;
     private View todayHealthPanel;
     private boolean isHealthPanelVisible = false;
 
+    // 선택 모드 필드
+    private boolean isSelectionMode = false;
+    private final HashSet<String> selectedKeys = new HashSet<>();
+    private LinearLayout layoutSelectionToolbar;
+    private TextView tvSelectionCount;
+    private TextView btnSelectAll;
+    private TextView btnDeleteSelected;
+    private TextView btnCancelSelection;
 
+    private String makeItemKey(ScheduleMedicineItem item) {
+        return item.getCategoryName() + "_"
+                + item.getStartDate() + "_"
+                + item.getTimeSlot();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Android 13 이상에서만 권한 요청
+        getOnBackPressedDispatcher().addCallback(this,
+                new androidx.activity.OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (isSelectionMode) {
+                            exitSelectionMode();
+                        } else {
+                            setEnabled(false);
+                            getOnBackPressedDispatcher().onBackPressed();
+                        }
+                    }
+                });
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
@@ -95,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         applyHomeBannerMessage();
         setupDateNavigation();
         setupManualRegisterButton();
+        setupSelectionToolbar();
         handleRequestedTab(getIntent());
     }
 
@@ -116,37 +132,121 @@ public class MainActivity extends AppCompatActivity {
         fabChatbot = findViewById(R.id.fab_chatbot);
         bottomNavigationView = findViewById(R.id.bottom_nav);
         tvBannerMessage = findViewById(R.id.tv_banner_message);
-
         mainScroll = findViewById(R.id.main_scroll);
         fragmentContainer = findViewById(R.id.fragment_container);
-
         tvSelectedDate = findViewById(R.id.tv_selected_date);
         btnPrevDate = findViewById(R.id.btn_prev_date);
         btnNextDate = findViewById(R.id.btn_next_date);
-
         layoutMorningMedicineList = findViewById(R.id.layout_morning_medicine_list);
         layoutLunchMedicineList = findViewById(R.id.layout_lunch_medicine_list);
         layoutDinnerMedicineList = findViewById(R.id.layout_dinner_medicine_list);
-
         tvEmptyMorning = findViewById(R.id.tv_empty_morning);
         tvEmptyLunch = findViewById(R.id.tv_empty_lunch);
         tvEmptyDinner = findViewById(R.id.tv_empty_dinner);
-
         btnCalendar = findViewById(R.id.btn_calendar);
         selectedCalendar = Calendar.getInstance();
-
-        // 오늘의 건강 패널
         dimOverlay = findViewById(R.id.dim_overlay);
         todayHealthPanel = findViewById(R.id.layout_today_health_panel);
+        layoutSelectionToolbar = findViewById(R.id.layout_selection_toolbar);
+        tvSelectionCount = findViewById(R.id.tv_selection_count);
+        btnSelectAll = findViewById(R.id.btn_select_all);
+        btnDeleteSelected = findViewById(R.id.btn_delete_selected);
+        btnCancelSelection = findViewById(R.id.btn_cancel_selection);
     }
 
-    // 하단 네비게이션
+    // 선택 모드 툴바 (다이얼로그 1번만)
+    private void setupSelectionToolbar() {
+        if (btnCancelSelection != null) {
+            btnCancelSelection.setOnClickListener(v -> exitSelectionMode());
+        }
+        if (btnSelectAll != null) {
+            btnSelectAll.setOnClickListener(v -> selectAll());
+        }
+        if (btnDeleteSelected != null) {
+            btnDeleteSelected.setOnClickListener(v -> {
+                if (selectedKeys.isEmpty()) {
+                    Toast.makeText(this, "선택된 항목이 없습니다.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // 삭제할 아이템 수집
+                ArrayList<ScheduleMedicineItem> all = ScheduleRepository.getAllSchedules(this);
+                final ArrayList<ScheduleMedicineItem> toDelete = new ArrayList<>();
+                for (ScheduleMedicineItem item : all) {
+                    if (selectedKeys.contains(makeItemKey(item))) {
+                        toDelete.add(item);
+                    }
+                }
+
+                Log.d("DeleteTest", "toDelete 수: " + toDelete.size());
+
+                if (toDelete.isEmpty()) {
+                    Toast.makeText(this, "선택된 항목이 없습니다.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // 다이얼로그 1번만 표시
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("선택 삭제")
+                        .setMessage(toDelete.size() + "개의 복약 일정을 삭제할까요?")
+                        .setNegativeButton("취소", null)
+                        .setPositiveButton("삭제", (dialog, which) ->
+                                executeDelete(toDelete))
+                        .show();
+            });
+        }
+    }
+
+    private void enterSelectionMode() {
+        isSelectionMode = true;
+        selectedKeys.clear();
+        if (layoutSelectionToolbar != null) layoutSelectionToolbar.setVisibility(View.VISIBLE);
+        updateSelectionCount();
+        renderScheduleForSelectedDate();
+    }
+
+    private void exitSelectionMode() {
+        isSelectionMode = false;
+        selectedKeys.clear();
+        if (layoutSelectionToolbar != null) layoutSelectionToolbar.setVisibility(View.GONE);
+        renderScheduleForSelectedDate();
+    }
+
+    private void selectAll() {
+        String selectedDate = getSelectedDateString();
+        ArrayList<ScheduleMedicineItem> schedules =
+                ScheduleRepository.getSchedulesByDate(this, selectedDate);
+        selectedKeys.clear();
+        for (ScheduleMedicineItem item : schedules) {
+            selectedKeys.add(makeItemKey(item));
+        }
+        updateSelectionCount();
+        renderScheduleForSelectedDate();
+    }
+
+    private void updateSelectionCount() {
+        if (tvSelectionCount != null) {
+            tvSelectionCount.setText(selectedKeys.size() + "개 선택됨");
+        }
+    }
+
+    // 실제 삭제 실행 (다이얼로그 없음, 1번만 호출)
+    private void executeDelete(ArrayList<ScheduleMedicineItem> toDelete) {
+        int total = toDelete.size();
+        Log.d("DeleteTest", "executeDelete 시작: " + total + "개");
+
+        MedicationServerSync.deleteMedicationBatch(this, toDelete, () ->
+                runOnUiThread(() -> {
+                    exitSelectionMode();
+                    Toast.makeText(this, total + "개 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                })
+        );
+    }
+
     private void setupBottomNavigation() {
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
-
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-
             if (id == R.id.nav_home) {
                 showHomeContent();
                 renderScheduleForSelectedDate();
@@ -176,14 +276,12 @@ public class MainActivity extends AppCompatActivity {
         if (mainScroll != null) mainScroll.setVisibility(View.GONE);
         if (fragmentContainer != null) fragmentContainer.setVisibility(View.VISIBLE);
         if (fabChatbot != null) fabChatbot.setVisibility(View.GONE);
-
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, new ScanCameraFragment())
                 .commit();
     }
 
-    // FAB / 캘린더 버튼
     private void setupFabChatbot() {
         if (fabChatbot == null) return;
         fabChatbot.setOnClickListener(v ->
@@ -196,19 +294,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, MedicationCalendarActivity.class)));
     }
 
-    // 오늘의 건강 패널
     private void setupHealthButton() {
         ImageView ivFavorite = findViewById(R.id.iv_favorite);
         if (ivFavorite == null) return;
-
         ivFavorite.setOnClickListener(v -> {
-            if (isHealthPanelVisible) {
-                hideHealthPanel(ivFavorite);
-            } else {
-                showHealthPanel(ivFavorite);
-            }
+            if (isHealthPanelVisible) hideHealthPanel(ivFavorite);
+            else showHealthPanel(ivFavorite);
         });
-
         if (dimOverlay != null) {
             dimOverlay.setOnClickListener(v ->
                     hideHealthPanel(findViewById(R.id.iv_favorite)));
@@ -220,22 +312,18 @@ public class MainActivity extends AppCompatActivity {
             heartIcon.setImageResource(R.drawable.ic_heart_filled);
             heartIcon.clearColorFilter();
         }
-
         if (dimOverlay != null) {
             dimOverlay.setVisibility(View.VISIBLE);
             dimOverlay.setAlpha(0f);
             dimOverlay.animate().alpha(1f).setDuration(200).start();
         }
-
         bindHealthPanelData();
-
         if (todayHealthPanel != null) {
             todayHealthPanel.setVisibility(View.VISIBLE);
             todayHealthPanel.setAlpha(0f);
             todayHealthPanel.setTranslationY(-20f);
             todayHealthPanel.animate().alpha(1f).translationY(0f).setDuration(250).start();
         }
-
         isHealthPanelVisible = true;
     }
 
@@ -244,36 +332,28 @@ public class MainActivity extends AppCompatActivity {
             heartIcon.setImageResource(R.drawable.ic_heart);
             heartIcon.clearColorFilter();
         }
-
         if (dimOverlay != null) {
             dimOverlay.animate().alpha(0f).setDuration(200)
                     .withEndAction(() -> dimOverlay.setVisibility(View.GONE)).start();
         }
-
         if (todayHealthPanel != null) {
             todayHealthPanel.animate().alpha(0f).translationY(-20f).setDuration(200)
                     .withEndAction(() -> todayHealthPanel.setVisibility(View.GONE)).start();
         }
-
         isHealthPanelVisible = false;
     }
 
     private void bindHealthPanelData() {
         if (todayHealthPanel == null) return;
-
         TextView tvUpcoming = todayHealthPanel.findViewById(R.id.tv_upcoming_medicine);
         ImageButton btnClose = todayHealthPanel.findViewById(R.id.btn_close_health);
-
         if (btnClose != null) {
             btnClose.setOnClickListener(v ->
                     hideHealthPanel(findViewById(R.id.iv_favorite)));
         }
-
         if (tvUpcoming == null) return;
-
         TodayHealthManager.UpcomingMedicineInfo info =
                 TodayHealthManager.getUpcomingMedicine(this);
-
         if (info == null) {
             tvUpcoming.setText("오늘 복용할 약이 없습니다.");
         } else {
@@ -281,7 +361,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //  배너 / 날짜 네비게이션
     private void applyHomeBannerMessage() {
         String message = SettingsManager.getHomeMessage(this);
         tvBannerMessage.setText(message);
@@ -304,11 +383,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleRequestedTab(Intent intent) {
         if (intent == null) return;
-
-        // 알림 클릭으로 진입한 경우 → 시간대 완료 처리
         String completeTimeSlot = intent.getStringExtra(
                 MedicationAlarmReceiver.EXTRA_COMPLETE_TIME_SLOT);
-
         if (completeTimeSlot != null && !completeTimeSlot.isEmpty()) {
             bottomNavigationView.setSelectedItemId(R.id.nav_home);
             showHomeContent();
@@ -316,7 +392,6 @@ public class MainActivity extends AppCompatActivity {
             markTimeSlotAsCompleted(completeTimeSlot);
             return;
         }
-
         String openTab = intent.getStringExtra("open_tab");
         if ("scan".equals(openTab)) {
             bottomNavigationView.setSelectedItemId(R.id.nav_scan);
@@ -328,21 +403,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //  복약 스케줄 렌더링
     private void renderScheduleForSelectedDate() {
         String selectedDate = getSelectedDateString();
-
         if (tvSelectedDate != null) {
             tvSelectedDate.setText(isToday(selectedCalendar) ? "오늘" : selectedDate);
         }
-
         if (layoutMorningMedicineList != null) layoutMorningMedicineList.removeAllViews();
         if (layoutLunchMedicineList != null) layoutLunchMedicineList.removeAllViews();
         if (layoutDinnerMedicineList != null) layoutDinnerMedicineList.removeAllViews();
 
         ArrayList<ScheduleMedicineItem> schedules =
                 ScheduleRepository.getSchedulesByDate(this, selectedDate);
-
         ArrayList<ScheduleMedicineItem> morningList = new ArrayList<>();
         ArrayList<ScheduleMedicineItem> lunchList = new ArrayList<>();
         ArrayList<ScheduleMedicineItem> dinnerList = new ArrayList<>();
@@ -364,92 +435,120 @@ public class MainActivity extends AppCompatActivity {
                                     ArrayList<ScheduleMedicineItem> items, String timeSlot) {
         if (container == null || emptyView == null) return;
         container.removeAllViews();
-
         if (items == null || items.isEmpty()) {
             emptyView.setVisibility(View.VISIBLE);
             return;
         }
-
         emptyView.setVisibility(View.GONE);
         LayoutInflater inflater = LayoutInflater.from(this);
-
-        // 현재 선택된 날짜 기준으로 완료 상태 판단
         String currentDate = getSelectedDateString();
 
         for (ScheduleMedicineItem item : items) {
-            View itemView = inflater.inflate(R.layout.item_schedule_medicine, container, false);
+            View itemView = inflater.inflate(
+                    R.layout.item_schedule_medicine, container, false);
 
             TextView tvCategoryName = itemView.findViewById(R.id.tv_category_name);
             TextView btnTakeDone = itemView.findViewById(R.id.btn_take_done);
             View foreground = itemView.findViewById(R.id.layout_swipe_foreground);
-            View btnDelete = itemView.findViewById(R.id.btn_delete_schedule);
+            CheckBox checkbox = itemView.findViewById(R.id.checkbox_item);
 
-            if (tvCategoryName != null) {
-                tvCategoryName.setText(item.getCategoryName());
-            }
+            if (tvCategoryName != null) tvCategoryName.setText(item.getCategoryName());
 
-            // 선택된 날짜 기준으로 완료 상태 확인
             boolean doneToday = item.isCompletedOn(currentDate);
-            updateTakeButtonStyle(foreground, btnTakeDone, doneToday);
+            updateTakeButtonStyle(foreground, tvCategoryName, btnTakeDone, doneToday);
 
-            if (btnTakeDone != null) {
-                btnTakeDone.setOnClickListener(v -> {
-                    boolean current = item.isCompletedOn(currentDate);
-                    item.setCompletedOn(currentDate, !current);
-                    ScheduleRepository.updateCompletedForDate(this, item, currentDate);
-                    updateTakeButtonStyle(foreground, btnTakeDone, !current);
-
-                    // 추가: 서버 intake_logs 동기화
-                    if (!current) {
-                        // 미완료 → 완료
-                        IntakeServerSync.syncTaken(
-                                this,
-                                item.getCategoryName(),
-                                item.getTimeSlot(),
-                                currentDate
-                        );
+            if (isSelectionMode) {
+                if (checkbox != null) {
+                    checkbox.setVisibility(View.VISIBLE);
+                    checkbox.setChecked(selectedKeys.contains(makeItemKey(item)));
+                    if (doneToday) {
+                        checkbox.setButtonTintList(
+                                android.content.res.ColorStateList.valueOf(
+                                        android.graphics.Color.WHITE));
                     } else {
-                        // 완료 → 미완료
-                        IntakeServerSync.syncCanceled(
-                                this,
-                                item.getCategoryName(),
-                                item.getTimeSlot(),
-                                currentDate
-                        );
+                        checkbox.setButtonTintList(
+                                android.content.res.ColorStateList.valueOf(
+                                        android.graphics.Color.parseColor("#FF786E")));
                     }
+                    checkbox.setOnCheckedChangeListener((btn, isChecked) -> {
+                        if (isChecked) selectedKeys.add(makeItemKey(item));
+                        else selectedKeys.remove(makeItemKey(item));
+                        updateSelectionCount();
+                    });
+                }
+                if (btnTakeDone != null) btnTakeDone.setEnabled(false);
+                itemView.setOnClickListener(v -> {
+                    String key = makeItemKey(item);
+                    if (selectedKeys.contains(key)) {
+                        selectedKeys.remove(key);
+                        if (checkbox != null) checkbox.setChecked(false);
+                    } else {
+                        selectedKeys.add(key);
+                        if (checkbox != null) checkbox.setChecked(true);
+                    }
+                    updateSelectionCount();
+                });
+
+            } else {
+                if (checkbox != null) {
+                    checkbox.setVisibility(View.GONE);
+                    checkbox.setOnCheckedChangeListener(null);
+                }
+                if (btnTakeDone != null) btnTakeDone.setEnabled(true);
+
+                if (btnTakeDone != null) {
+                    btnTakeDone.setOnClickListener(v -> {
+                        boolean current = item.isCompletedOn(currentDate);
+                        item.setCompletedOn(currentDate, !current);
+                        ScheduleRepository.updateCompletedForDate(this, item, currentDate);
+                        updateTakeButtonStyle(foreground, tvCategoryName, btnTakeDone, !current);
+                        if (!current) {
+                            IntakeServerSync.syncTaken(this,
+                                    item.getCategoryName(), item.getTimeSlot(), currentDate);
+                        } else {
+                            IntakeServerSync.syncCanceled(this,
+                                    item.getCategoryName(), item.getTimeSlot(), currentDate);
+                        }
+                    });
+                }
+
+                itemView.setOnLongClickListener(v -> {
+                    enterSelectionMode();
+                    selectedKeys.add(makeItemKey(item));
+                    updateSelectionCount();
+                    renderScheduleForSelectedDate();
+                    return true;
                 });
             }
-
-            if (foreground != null) {
-                setupSwipeToDelete(foreground, btnDelete, item);
-            }
-
             container.addView(itemView);
         }
     }
 
-    // boolean 파라미터로 받아서 날짜 기준 적용
-    private void updateTakeButtonStyle(View foreground, TextView btnTakeDone, boolean isCompleted) {
+    private void updateTakeButtonStyle(View foreground, TextView tvCategoryName,
+                                       TextView btnTakeDone, boolean isCompleted) {
         if (foreground == null || btnTakeDone == null) return;
-
         if (isCompleted) {
             foreground.setBackgroundResource(R.drawable.bg_schedule_item_done);
+            if (tvCategoryName != null)
+                tvCategoryName.setTextColor(
+                        ContextCompat.getColor(this, android.R.color.white));
             btnTakeDone.setText("완료");
             btnTakeDone.setTextColor(ContextCompat.getColor(this, R.color.main_coral));
             btnTakeDone.setBackgroundResource(R.drawable.bg_schedule_done_button_done);
         } else {
             foreground.setBackgroundResource(R.drawable.bg_schedule_item_pending);
+            if (tvCategoryName != null)
+                tvCategoryName.setTextColor(
+                        ContextCompat.getColor(this, R.color.dark_gray));
             btnTakeDone.setText("미완료");
             btnTakeDone.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
             btnTakeDone.setBackgroundResource(R.drawable.bg_schedule_done_button_pending);
         }
     }
 
-    // 수기 등록 버튼
     private void setupManualRegisterButton() {
         ImageButton btnAddMedicine = findViewById(R.id.btn_add_medicine);
         if (btnAddMedicine == null) return;
-
         btnAddMedicine.setOnClickListener(v ->
                 ManualRegisterDialogFragment.newInstance(() ->
                         renderScheduleForSelectedDate()
@@ -459,13 +558,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void markTimeSlotAsCompleted(String timeSlot) {
         if (timeSlot == null || timeSlot.isEmpty()) return;
-
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 .format(Calendar.getInstance().getTime());
-
         ArrayList<ScheduleMedicineItem> todaySchedules =
                 ScheduleRepository.getSchedulesByDate(this, today);
-
         boolean updated = false;
         for (ScheduleMedicineItem item : todaySchedules) {
             if (item == null) continue;
@@ -475,100 +571,12 @@ public class MainActivity extends AppCompatActivity {
                 updated = true;
             }
         }
-
         if (updated) {
             renderScheduleForSelectedDate();
             Toast.makeText(this,
-                    timeSlot + " 복약 완료 처리되었습니다.",
-                    Toast.LENGTH_SHORT).show();
+                    timeSlot + " 복약 완료 처리되었습니다.", Toast.LENGTH_SHORT).show();
         }
     }
-
-
-    @SuppressLint("ClickableViewAccessibility")
-    private void setupSwipeToDelete(View foreground, View deleteBtn, ScheduleMedicineItem item) {
-        float deleteWidth = 80 * getResources().getDisplayMetrics().density;
-        float threshold = deleteWidth / 2;
-
-        final float[] startX = {0f};
-        final float[] currentX = {0f};
-        final boolean[] isOpen = {false};
-
-        foreground.setOnTouchListener((v, event) -> {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    startX[0] = event.getRawX();
-                    return true;
-
-                case MotionEvent.ACTION_MOVE:
-                    float dx = event.getRawX() - startX[0];
-                    float baseTx = isOpen[0] ? -deleteWidth : 0f;
-                    float newTx = Math.min(0f, Math.max(-deleteWidth, baseTx + dx));
-                    foreground.setTranslationX(newTx);
-                    currentX[0] = newTx;
-                    return true;
-
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    float tx = currentX[0];
-                    if (!isOpen[0]) {
-                        if (tx < -threshold) {
-                            openSwipe(foreground, deleteWidth);
-                            isOpen[0] = true;
-                        } else {
-                            closeSwipe(foreground);
-                            isOpen[0] = false;
-                        }
-                    } else {
-                        if (tx > -threshold) {
-                            closeSwipe(foreground);
-                            isOpen[0] = false;
-                        } else {
-                            openSwipe(foreground, deleteWidth);
-                            isOpen[0] = true;
-                        }
-                    }
-                    return true;
-            }
-            return false;
-        });
-
-        // setupSwipeToDelete() 안의 삭제 버튼 클릭
-        if (deleteBtn != null) {
-            deleteBtn.setOnClickListener(v ->
-                    new MaterialAlertDialogBuilder(this)
-                            .setTitle("복약 삭제")
-                            .setMessage("'" + item.getCategoryName() + "' 복약 일정을 삭제할까요?")
-                            .setNegativeButton("취소", (dialog, which) -> closeSwipe(foreground))
-                            .setPositiveButton("삭제", (dialog, which) -> {
-                                // 수정: 기존 로컬 삭제 → 서버+로컬 동시 삭제
-                                MedicationServerSync.deleteMedication(
-                                        this,
-                                        item,
-                                        () -> renderScheduleForSelectedDate()
-                                );
-                            })
-                            .show()
-            );
-        }
-    }
-
-    private void openSwipe(View foreground, float deleteWidth) {
-        foreground.animate()
-                .translationX(-deleteWidth)
-                .setDuration(150)
-                .setInterpolator(new DecelerateInterpolator())
-                .start();
-    }
-
-    private void closeSwipe(View foreground) {
-        foreground.animate()
-                .translationX(0f)
-                .setDuration(150)
-                .setInterpolator(new DecelerateInterpolator())
-                .start();
-    }
-
 
     private String getSelectedDateString() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());

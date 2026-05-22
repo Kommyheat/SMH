@@ -294,7 +294,6 @@ public class UserProfileActivity extends AppCompatActivity {
     @SuppressLint("QueryPermissionsNeeded")
     private void openCamera() {
         try {
-            // 수정: getFilesDir() 사용 (files-path로 등록됨)
             File photoFile = new File(getFilesDir(), "temp_camera.jpg");
             if (photoFile.exists()) photoFile.delete();
 

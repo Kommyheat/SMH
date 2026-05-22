@@ -9,12 +9,14 @@ import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 
 import com.app.smh.R;
+import com.app.smh.scan.DrugInfoApiManager;
+import com.app.smh.scan.DrugResultItem;
 import com.app.smh.schedule.ScheduleMedicineItem;
 import com.app.smh.schedule.ScheduleRepository;
 import com.app.smh.SettingsManager;
@@ -43,6 +45,7 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
 
     private Calendar currentMonthCalendar;
     private Calendar selectedDateCalendar;
+
 
 
     @Override
@@ -136,11 +139,8 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
         return items;
     }
 
-    /**
-     * 수정: 날짜별 완료 상태 확인
-     * isCompleted() → isCompletedOn(date) 로 변경
-     * 5/9에 완료해도 5/10~5/12는 미완료 유지
-     */
+    //날짜별 완료 상태 확인 .. 5/9에 완료해도 5/10~5/12는 미완료 유지
+
     private boolean isDateAllCompleted(String date) {
         ArrayList<ScheduleMedicineItem> items =
                 ScheduleRepository.getSchedulesByDate(this, date);
@@ -176,10 +176,7 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
         tvLegendProgress.setText(progressCount + " 진행중");
     }
 
-    /**
-     * 수정: 완료 상태 표시를 날짜 기준으로 변경
-     * item.isCompleted() → item.isCompletedOn(date)
-     */
+    // 완료 상태 표시를 날짜 기준
     private void renderSelectedDateDetails() {
         String title = new SimpleDateFormat("M월 d일 EEEE", Locale.KOREAN)
                 .format(selectedDateCalendar.getTime());
@@ -215,6 +212,8 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
             // 해당 날짜 기준으로 완료 상태 표시
             if (item.isCompletedOn(date)) {
                 detailView.setBackgroundResource(R.drawable.bg_schedule_item_done);
+                tvCategory.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+                tvTime.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
                 tvStatus.setText("완료");
                 tvStatus.setTextColor(ContextCompat.getColor(this, R.color.main_coral));
                 tvStatus.setBackgroundResource(R.drawable.bg_schedule_done_button_done);
@@ -233,7 +232,6 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
             layoutDetailList.addView(detailView);
         }
     }
-
     private void showDrugDetailBottomSheet(ScheduleMedicineItem scheduleItem) {
         BottomSheetDialog bottomSheet = new BottomSheetDialog(this);
         View sheetView = getLayoutInflater().inflate(
@@ -244,51 +242,236 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
         TextView tvBsTimeSlot = sheetView.findViewById(R.id.tv_bs_time_slot);
         ProgressBar progressBs = sheetView.findViewById(R.id.progress_bs);
         TextView tvBsError = sheetView.findViewById(R.id.tv_bs_error);
+        com.google.android.material.chip.ChipGroup chipGroupDrugs =
+                sheetView.findViewById(R.id.chip_group_drugs);
         ScrollView scrollBsDetail = sheetView.findViewById(R.id.scroll_bs_detail);
         LinearLayout layoutDrugList = sheetView.findViewById(R.id.layout_bs_drug_list);
+        android.widget.EditText etBsMemo = sheetView.findViewById(R.id.et_bs_memo);
+        LinearLayout btnBsSaveMemo = sheetView.findViewById(R.id.btn_bs_save_memo);
 
         tvBsDrugName.setText(scheduleItem.getCategoryName());
         tvBsTimeSlot.setText(scheduleItem.getTimeSlot() + " 복용");
-        progressBs.setVisibility(View.GONE);
+
+        // 기존 메모 불러오기
+        String existingMemo = scheduleItem.getMemo();
+        if (existingMemo != null && !existingMemo.isEmpty()) {
+            etBsMemo.setText(existingMemo);
+        }
+
+        // 초기 상태: 저장 버튼 숨김
+        btnBsSaveMemo.setVisibility(View.GONE);
+
+        // 텍스트 입력 시 저장 버튼 표시
+        etBsMemo.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // 입력 시작하면 저장 버튼 표시
+                btnBsSaveMemo.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+
+        btnBsSaveMemo.setOnClickListener(v -> {
+            String memo = etBsMemo.getText().toString();
+            scheduleItem.setMemo(memo);
+            ScheduleRepository.updateCompleted(this, scheduleItem);
+
+            // 저장 후 버튼 숨기기
+            btnBsSaveMemo.setVisibility(View.GONE);
+
+            // 포커스 제거 → 깜빡이 사라짐
+            etBsMemo.clearFocus();
+
+            // 키보드 내리기
+            android.view.inputmethod.InputMethodManager imm =
+                    (android.view.inputmethod.InputMethodManager)
+                            getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(etBsMemo.getWindowToken(), 0);
+            }
+
+            android.widget.Toast.makeText(this, "메모가 저장되었습니다.",
+                    android.widget.Toast.LENGTH_SHORT).show();
+        });
+
 
         List<ScheduleMedicineItem.DrugDetail> details = scheduleItem.getDrugDetails();
 
-        if (details == null || details.isEmpty()) {
-            tvBsError.setText("저장된 약 상세정보가 없습니다.");
-            tvBsError.setVisibility(View.VISIBLE);
-            scrollBsDetail.setVisibility(View.GONE);
+        if (details != null && !details.isEmpty()) {
+            progressBs.setVisibility(View.GONE);
+            setupDrugChips(chipGroupDrugs, layoutDrugList,
+                    scrollBsDetail, tvBsError, details);
         } else {
+            progressBs.setVisibility(View.VISIBLE);
             tvBsError.setVisibility(View.GONE);
-            scrollBsDetail.setVisibility(View.VISIBLE);
-            layoutDrugList.removeAllViews();
+            scrollBsDetail.setVisibility(View.GONE);
+            chipGroupDrugs.setVisibility(View.GONE);
 
-            for (ScheduleMedicineItem.DrugDetail detail : details) {
-                TextView tvDrugHeader = new TextView(this);
-                tvDrugHeader.setText("■ " + detail.recognizedName);
-                tvDrugHeader.setTextColor(0xFF111111);
-                tvDrugHeader.setTextSize(15f);
-                tvDrugHeader.setTypeface(null, android.graphics.Typeface.BOLD);
-                tvDrugHeader.setPadding(0, 16, 0, 8);
-                layoutDrugList.addView(tvDrugHeader);
+            ArrayList<String> drugNames = scheduleItem.getDrugNames();
+            if (drugNames == null || drugNames.isEmpty()) {
+                drugNames = new ArrayList<>();
+                drugNames.add(scheduleItem.getCategoryName());
+            }
 
-                addDetailRow(layoutDrugList, "품목명", detail.itemName);
-                addDetailRow(layoutDrugList, "제조사", detail.entpName);
-                addDetailRow(layoutDrugList, "효능/효과", detail.efcyQesitm);
-                addDetailRow(layoutDrugList, "용법/용량", detail.useMethodQesitm);
-                addDetailRow(layoutDrugList, "주의사항", detail.atpnWarnQesitm);
-                addDetailRow(layoutDrugList, "보관방법", detail.depositMethodQesitm);
+            DrugInfoApiManager apiManager = new DrugInfoApiManager();
+            List<ScheduleMedicineItem.DrugDetail> fetchedDetails = new ArrayList<>();
+            final int[] remaining = {drugNames.size()};
 
-                View divider = new View(this);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, 1);
-                params.setMargins(0, 8, 0, 8);
-                divider.setLayoutParams(params);
-                divider.setBackgroundColor(0xFFF0F0F0);
-                layoutDrugList.addView(divider);
+            for (String drugName : drugNames) {
+                apiManager.fetchDrugDetail(drugName,
+                        new DrugInfoApiManager.DetailCallback() {
+                            @Override
+                            public void onSuccess(DrugResultItem result) {
+                                if (result.hasDetail()) {
+                                    ScheduleMedicineItem.DrugDetail detail =
+                                            new ScheduleMedicineItem.DrugDetail();
+                                    detail.recognizedName = drugName;
+                                    detail.itemName = result.getItemName();
+                                    detail.entpName = result.getEntpName();
+                                    detail.efcyQesitm = result.getEfcyQesitm();
+                                    detail.useMethodQesitm = result.getUseMethodQesitm();
+                                    detail.atpnWarnQesitm = result.getAtpnWarnQesitm();
+                                    detail.depositMethodQesitm = result.getDepositMethodQesitm();
+                                    fetchedDetails.add(detail);
+                                }
+                                remaining[0]--;
+                                if (remaining[0] <= 0) {
+                                    progressBs.setVisibility(View.GONE);
+                                    if (fetchedDetails.isEmpty()) {
+                                        tvBsError.setText("약 상세정보를 찾을 수 없습니다.");
+                                        tvBsError.setVisibility(View.VISIBLE);
+                                    } else {
+                                        setupDrugChips(chipGroupDrugs, layoutDrugList,
+                                                scrollBsDetail, tvBsError, fetchedDetails);
+                                        scheduleItem.setDrugDetails(fetchedDetails);
+                                        ScheduleRepository.updateDrugDetails(
+                                                MedicationCalendarActivity.this, scheduleItem);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onError(String message) {
+                                remaining[0]--;
+                                if (remaining[0] <= 0) {
+                                    progressBs.setVisibility(View.GONE);
+                                    tvBsError.setText("약 상세정보 조회에 실패했습니다.");
+                                    tvBsError.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        });
             }
         }
 
         bottomSheet.show();
+    }
+
+    // 약품명 Chip 버튼 생성 + 클릭 시 상세정보 표시
+
+    private void setupDrugChips(
+            com.google.android.material.chip.ChipGroup chipGroup,
+            LinearLayout layoutDrugList,
+            ScrollView scrollBsDetail,
+            TextView tvBsError,
+            List<ScheduleMedicineItem.DrugDetail> details) {
+
+        chipGroup.removeAllViews();
+        chipGroup.setVisibility(View.VISIBLE);
+        scrollBsDetail.setVisibility(View.GONE);
+        tvBsError.setVisibility(View.GONE);
+
+        for (ScheduleMedicineItem.DrugDetail detail : details) {
+            com.google.android.material.chip.Chip chip =
+                    new com.google.android.material.chip.Chip(this);
+            chip.setText(detail.recognizedName);
+            chip.setCheckable(true);
+            chip.setChipBackgroundColorResource(android.R.color.white);
+            chip.setChipStrokeColorResource(R.color.main_coral);
+            chip.setChipStrokeWidth(2f);
+            chip.setTextColor(getColor(R.color.black));
+
+            chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    // 선택된 Chip 코럴색
+                    chip.setChipBackgroundColor(
+                            android.content.res.ColorStateList.valueOf(
+                                    android.graphics.Color.parseColor("#FF786E")));
+                    chip.setTextColor(android.graphics.Color.WHITE);
+
+                    // 상세정보 표시
+                    showSingleDrugDetail(layoutDrugList, scrollBsDetail, detail);
+                } else {
+                    // 선택 해제 흰색
+                    chip.setChipBackgroundColor(
+                            android.content.res.ColorStateList.valueOf(
+                                    android.graphics.Color.WHITE));
+                    chip.setTextColor(getColor(R.color.black));
+                }
+            });
+
+            chipGroup.addView(chip);
+        }
+
+        // 약품이 1개면 자동 선택
+        if (details.size() == 1) {
+            com.google.android.material.chip.Chip firstChip =
+                    (com.google.android.material.chip.Chip) chipGroup.getChildAt(0);
+            if (firstChip != null) firstChip.setChecked(true);
+        }
+    }
+
+    // 선택된 약품 1개 상세정보 표시
+    private void showSingleDrugDetail(LinearLayout layoutDrugList,
+                                      ScrollView scrollBsDetail,
+                                      ScheduleMedicineItem.DrugDetail detail) {
+        scrollBsDetail.setVisibility(View.VISIBLE);
+        layoutDrugList.removeAllViews();
+
+        addDetailRow(layoutDrugList, "품목명", detail.itemName);
+        addDetailRow(layoutDrugList, "제조사", detail.entpName);
+        addDetailRow(layoutDrugList, "효능/효과", detail.efcyQesitm);
+        addDetailRow(layoutDrugList, "용법/용량", detail.useMethodQesitm);
+        addDetailRow(layoutDrugList, "주의사항", detail.atpnWarnQesitm);
+        addDetailRow(layoutDrugList, "보관방법", detail.depositMethodQesitm);
+    }
+
+    // 약품 상세정보 목록 표시 (공통 메서드)
+    private void showDrugDetails(LinearLayout layoutDrugList, ScrollView scrollBsDetail,
+                                 TextView tvBsError,
+                                 List<ScheduleMedicineItem.DrugDetail> details) {
+        tvBsError.setVisibility(View.GONE);
+        scrollBsDetail.setVisibility(View.VISIBLE);
+        layoutDrugList.removeAllViews();
+
+        for (ScheduleMedicineItem.DrugDetail detail : details) {
+            TextView tvDrugHeader = new TextView(this);
+            tvDrugHeader.setText("■ " + detail.recognizedName);
+            tvDrugHeader.setTextColor(0xFF111111);
+            tvDrugHeader.setTextSize(15f);
+            tvDrugHeader.setTypeface(null, android.graphics.Typeface.BOLD);
+            tvDrugHeader.setPadding(0, 16, 0, 8);
+            layoutDrugList.addView(tvDrugHeader);
+
+            addDetailRow(layoutDrugList, "품목명", detail.itemName);
+            addDetailRow(layoutDrugList, "제조사", detail.entpName);
+            addDetailRow(layoutDrugList, "효능/효과", detail.efcyQesitm);
+            addDetailRow(layoutDrugList, "용법/용량", detail.useMethodQesitm);
+            addDetailRow(layoutDrugList, "주의사항", detail.atpnWarnQesitm);
+            addDetailRow(layoutDrugList, "보관방법", detail.depositMethodQesitm);
+
+            View divider = new View(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 1);
+            params.setMargins(0, 8, 0, 8);
+            divider.setLayoutParams(params);
+            divider.setBackgroundColor(0xFFF0F0F0);
+            layoutDrugList.addView(divider);
+        }
     }
 
     private void addDetailRow(LinearLayout parent, String label, String value) {

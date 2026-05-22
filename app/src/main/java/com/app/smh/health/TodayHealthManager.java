@@ -146,11 +146,7 @@ public class TodayHealthManager {
         }
     }
 
-    /**
-     * AlarmSettingsActivity와 동일한 24시간제 → 12시간제 변환
-     * "08:00" → "오전 08:00"
-     * "13:00" → "오후 01:00"
-     */
+    //AlarmSettingsActivity와 동일한 24시간제 → 12시간제 변환
     public static String to12HourDisplay(String time24) {
         try {
             String[] parts = time24.split(":");

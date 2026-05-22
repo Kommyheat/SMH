@@ -141,7 +141,7 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- 수정: RadioGroup → CheckBox 3개로 교체 + 코럴색 적용 -->
+    <!-- CheckBox -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -27,8 +27,10 @@ public class DrugSearchResultFragment extends Fragment {
 
     private ArrayList<String> drugNames;
     private String rawText;
+    private DrugInfoApiManager apiManager = new DrugInfoApiManager();
 
     public DrugSearchResultFragment() {
+
         super(R.layout.fragment_drug_search_result);
     }
 
@@ -45,10 +47,15 @@ public class DrugSearchResultFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        apiManager = new DrugInfoApiManager();
+
         initViews(view);
         getArgumentsData();
         setupRecyclerView();
         setupNextButton();
+        // 진입 시 약품 자동 조회
+        prefetchDrugDetails();
+
     }
 
     private void initViews(@NonNull View view) {
@@ -89,6 +96,47 @@ public class DrugSearchResultFragment extends Fragment {
         btnNext.setOnClickListener(v -> moveToScanGroupRegister());
     }
 
+
+     //최대 5개까지 동시 조회 (API 과호출 방지)
+    private void prefetchDrugDetails() {
+        if (drugNames == null || drugNames.isEmpty()) return;
+
+        int count = 0;
+        for (String drugName : drugNames) {
+            if (TextUtils.isEmpty(drugName)) continue;
+
+            // 이미 캐시에 있으면 스킵
+            if (DrugDetailCache.getInstance().get(drugName) != null) continue;
+
+            // 최대 5개까지만 자동 조회
+            if (count >= 5) break;
+            count++;
+
+            final String name = drugName;
+            apiManager.fetchDrugDetail(name, new DrugInfoApiManager.DetailCallback() {
+                @Override
+                public void onSuccess(DrugResultItem result) {
+                    // 캐시에 저장
+                    DrugDetailCache.getInstance().put(name, result);
+
+                    // RecyclerView 갱신 (Fragment 살아있을 때만)
+                    if (isAdded() && recyclerView != null) {
+                        requireActivity().runOnUiThread(() -> {
+                            RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
+                            if (adapter != null) adapter.notifyDataSetChanged();
+                        });
+                    }
+                }
+
+                @Override
+                public void onError(String message) {
+                    // 자동 조회 실패는 조용히 무시 (사용자에게 표시 안 함)
+                    android.util.Log.d("DrugPrefetch",
+                            "자동 조회 실패 (무시): " + name + " / " + message);
+                }
+            });
+        }
+    }
     private void moveToScanGroupRegister() {
         if (drugNames == null || drugNames.isEmpty()) {
             Toast.makeText(requireContext(), "등록할 약품명이 없습니다.", Toast.LENGTH_SHORT).show();

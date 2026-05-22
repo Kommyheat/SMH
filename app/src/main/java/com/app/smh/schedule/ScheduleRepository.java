@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.app.smh.scan.DrugInfoApiManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -31,6 +32,24 @@ public class ScheduleRepository {
         if (item == null) return;
         ArrayList<ScheduleMedicineItem> all = getAllSchedules(context);
         all.add(item);
+        saveLocal(context, all);
+    }
+
+    /**
+     * 달력에서 재조회한 상세정보를 로컬에 업데이트
+     */
+    public static void updateDrugDetails(Context context,
+                                         ScheduleMedicineItem targetItem) {
+        ArrayList<ScheduleMedicineItem> all = getAllSchedules(context);
+        for (ScheduleMedicineItem item : all) {
+            if (item != null &&
+                    item.getCategoryName().equals(targetItem.getCategoryName()) &&
+                    item.getStartDate().equals(targetItem.getStartDate()) &&
+                    item.getTimeSlot().equals(targetItem.getTimeSlot())) {
+                item.setDrugDetails(targetItem.getDrugDetails());
+                break;
+            }
+        }
         saveLocal(context, all);
     }
 
@@ -84,7 +103,7 @@ public class ScheduleRepository {
     }
 
     /**
-     * 추가: 특정 날짜의 완료 상태만 업데이트
+     * 특정 날짜의 완료 상태만 업데이트
      * 다른 날짜에는 영향 없음
      * 5/9에 완료 눌러도 5/10~5/12는 미완료 유지
      */
@@ -163,4 +182,10 @@ public class ScheduleRepository {
             Log.d("ScheduleRepository", "일치 항목 없음 → scheduleId 저장 실패");
         }
     }
+    // 전체 스케줄 저장 (완료 상태 포함)
+    public static void saveAllSchedules(Context context,
+                                        ArrayList<ScheduleMedicineItem> items) {
+        saveLocal(context, items);
+    }
+
 }

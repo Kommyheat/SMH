@@ -67,11 +67,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         switchBedtime = findViewById(R.id.switch_bedtime);
     }
 
-    /**
-     * SettingsManager에서 저장된 24시간제 "HH:mm"을 불러와
-     * 12시간제 "오전/오후 HH:mm" 형식으로 변환하여 표시
-     * (기존: tvMorningTime.setText("13:00") → 수정: "오후 01:00")
-     */
+    //12시간제 "오전/오후 HH:mm" 형식으로 변환하여 표시
     private void loadSavedSettings() {
         // null이면 예시 힌트 표시, 아니면 저장된 12시간제 시간 표시
         String morningTime = SettingsManager.getAlarmMorningTime(this);

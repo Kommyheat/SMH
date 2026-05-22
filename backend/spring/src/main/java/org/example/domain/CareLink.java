@@ -38,16 +38,12 @@ public class CareLink {
     @Column(nullable = false, length = 20)
     private CareLinkStatus status;
 
-    // 수정: DB가 NULL 허용이므로 nullable = true (기본값)
     @Column
     private LocalDateTime linkedAt;
 
-    // 수정: DB가 NULL 허용이므로 nullable = true (기본값)
     @Column
     private LocalDateTime disconnectedAt;
 
-    // 수정: 생성 시 PENDING으로 시작 (기존 ACTIVE → PENDING)
-    // 이유: 연동 요청 후 상대방이 수락해야 ACTIVE가 되는 흐름
     public CareLink(User caregiver, User patient) {
         validate(caregiver, patient);
         this.caregiver = caregiver;
@@ -57,13 +53,12 @@ public class CareLink {
         this.disconnectedAt = null;
     }
 
-    // 추가: 수락 → ACTIVE + linkedAt 설정
     public void accept() {
         this.status = CareLinkStatus.ACTIVE;
         this.linkedAt = LocalDateTime.now();
     }
 
-    // 추가: 거절 → REJECTED
+    // 거절 → REJECTED
     public void reject() {
         this.status = CareLinkStatus.REJECTED;
     }

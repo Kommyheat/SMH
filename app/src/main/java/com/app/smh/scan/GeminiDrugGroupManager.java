@@ -153,7 +153,7 @@ public class GeminiDrugGroupManager {
             item.setIntakeTime(obj.optString("intakeTime", ""));
             item.setBedtimeGroup(obj.optBoolean("bedtimeGroup", false));
 
-            // 수정: intakeTimes 배열 파싱
+            // intakeTimes 배열 파싱
             ArrayList<String> intakeTimes = new ArrayList<>();
             JSONArray timesArray = obj.optJSONArray("intakeTimes");
             if (timesArray != null) {

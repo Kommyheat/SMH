@@ -77,7 +77,7 @@ public class ScanGroupAdapter extends RecyclerView.Adapter<ScanGroupAdapter.Grou
         holder.tvBedtimeBadge.setVisibility(
                 item.isBedtimeGroup() ? View.VISIBLE : View.GONE);
 
-        // 수정: 리스너 먼저 해제 후 다중 선택 상태 반영
+        // 리스너 먼저 해제 후 다중 선택 상태 반영
         holder.chipGroupTime.setOnCheckedStateChangeListener(null);
         holder.chipGroupTime.clearCheck();
 
@@ -101,7 +101,7 @@ public class ScanGroupAdapter extends RecyclerView.Adapter<ScanGroupAdapter.Grou
                 })
         );
 
-        // 수정: 다중 선택 리스너
+        // 다중 선택 리스너
         holder.chipGroupTime.setOnCheckedStateChangeListener((group, checkedIds) -> {
             ArrayList<String> selected = new ArrayList<>();
 

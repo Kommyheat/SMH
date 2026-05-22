@@ -111,7 +111,7 @@ public class ScanGroupRegisterFragment extends Fragment {
                             if (item.getDrugNames() == null) item.setDrugNames(new ArrayList<>());
                             if (item.getStartDate() == null) item.setStartDate("");
                             if (item.getEndDate() == null) item.setEndDate("");
-                            // 수정: intakeTimes null 체크
+                            // intakeTimes null 체크
                             if (item.getIntakeTimes() == null) item.setIntakeTimes(new ArrayList<>());
                             safeGroups.add(item);
                         }
@@ -170,7 +170,7 @@ public class ScanGroupRegisterFragment extends Fragment {
             // 캐시에서 약품별 상세정보 구성
             List<ScheduleMedicineItem.DrugDetail> details = buildDrugDetails(item);
 
-            // 수정: 선택된 시간대마다 각각 ScheduleMedicineItem 생성
+            // 선택된 시간대마다 각각 ScheduleMedicineItem 생성
             for (String timeSlot : item.getIntakeTimes()) {
                 ScheduleMedicineItem scheduleItem = new ScheduleMedicineItem();
                 scheduleItem.setCategoryName(item.getGroupTitle());

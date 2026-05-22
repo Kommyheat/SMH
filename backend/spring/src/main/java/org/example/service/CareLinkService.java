@@ -145,7 +145,7 @@ public class CareLinkService {
             throw new IllegalArgumentException("이미 연동 요청 중입니다.");
         }
 
-        // 수정: DISCONNECTED 상태면 재활용 (새 레코드 생성 시 유니크 제약 오류 방지)
+        // DISCONNECTED 상태면 재활용 (새 레코드 생성 시 유니크 제약 오류 방지)
         java.util.Optional<CareLink> disconnected = careLinkRepository
                 .findByCaregiverAndPatientAndStatus(caregiver, patient, CareLinkStatus.DISCONNECTED);
 
@@ -154,7 +154,7 @@ public class CareLinkService {
             return new MessageResponse("연동 요청을 보냈습니다.");
         }
 
-        // 수정: REJECTED 상태면 재활용
+        //  REJECTED 상태면 재활용
         java.util.Optional<CareLink> rejected = careLinkRepository
                 .findByCaregiverAndPatientAndStatus(caregiver, patient, CareLinkStatus.REJECTED);
 
