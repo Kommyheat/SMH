@@ -60,6 +60,28 @@ public class ScanCameraFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        requireActivity().getWindow().setStatusBarColor(android.graphics.Color.BLACK);
+
+        View topAppBar = requireActivity().findViewById(R.id.top_app_bar);
+        if (topAppBar != null) {
+            topAppBar.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        View topAppBar = requireActivity().findViewById(R.id.top_app_bar);
+        if (topAppBar != null) {
+            topAppBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 

@@ -1,5 +1,6 @@
 package com.app.smh;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -34,7 +35,7 @@ public class GuardianLinkActivity extends AppCompatActivity {
     private TextView tvMyGuardianName;
     private TextView tvMyGuardianStatus;
 
-    // 추가: 수락/거절 버튼 영역
+    // 수락/거절 버튼 영역
     private LinearLayout layoutAcceptReject;
     private LinearLayout btnAcceptLink;
     private LinearLayout btnRejectLink;
@@ -53,6 +54,16 @@ public class GuardianLinkActivity extends AppCompatActivity {
     private LinearLayout btnViewPatientCalendar;
     private long currentPatientId = -1L;
     private String currentPatientName = "";
+
+
+    // 스위치 관련
+    private androidx.appcompat.widget.SwitchCompat switchShareStatus;
+    private androidx.appcompat.widget.SwitchCompat switchMissedAlert;
+    private LinearLayout layoutShareStatus;
+    private LinearLayout layoutMissedAlert;
+    private View dividerSwitch;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +109,17 @@ public class GuardianLinkActivity extends AppCompatActivity {
         // 달력보기
         layoutViewPatientCalendar = findViewById(R.id.layout_view_patient_calendar);
         btnViewPatientCalendar = findViewById(R.id.btn_view_patient_calendar);
+        // 스위치
+        switchShareStatus = findViewById(R.id.switch_share_status);
+        switchMissedAlert = findViewById(R.id.switch_missed_alert);
+        layoutShareStatus = findViewById(R.id.layout_share_status);
+        layoutMissedAlert = findViewById(R.id.layout_missed_alert);
+        dividerSwitch = findViewById(R.id.divider_switch);
+        // 저장된 설정 복원
+        switchShareStatus.setChecked(
+                SettingsManager.isShareStatusEnabled(this));
+        switchMissedAlert.setChecked(
+                SettingsManager.isMissedAlertEnabled(this));
     }
 
     private void setupListeners() {
@@ -122,7 +144,7 @@ public class GuardianLinkActivity extends AppCompatActivity {
             showConfirmDialog(inputCode);
         });
 
-        // 추가: 수락 버튼
+        // 수락 버튼
         btnAcceptLink.setOnClickListener(v -> {
             if (currentCareLinkId <= 0) {
                 Toast.makeText(this, "연동 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
@@ -136,7 +158,7 @@ public class GuardianLinkActivity extends AppCompatActivity {
                     .show();
         });
 
-        // 추가: 거절 버튼
+        // 거절 버튼
         btnRejectLink.setOnClickListener(v -> {
             if (currentCareLinkId <= 0) {
                 Toast.makeText(this, "연동 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
@@ -150,7 +172,7 @@ public class GuardianLinkActivity extends AppCompatActivity {
                     .show();
         });
 
-        // 추가: 연동 해체 버튼
+        // 연동 해체 버튼
         btnDisconnectLink.setOnClickListener(v -> {
             if (currentCareLinkId <= 0) {
                 Toast.makeText(this, "연동 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
@@ -165,7 +187,7 @@ public class GuardianLinkActivity extends AppCompatActivity {
         });
 
         btnViewPatientCalendar.setOnClickListener(v -> {
-            // 추가: patientId 확인 로그
+            // patientId 확인 로그
             android.util.Log.d("PatientCal", "patientId: " + currentPatientId);
             android.util.Log.d("PatientCal", "patientName: " + currentPatientName);
 
@@ -175,6 +197,32 @@ public class GuardianLinkActivity extends AppCompatActivity {
             intent.putExtra("patientName", currentPatientName);
             startActivity(intent);
         });
+
+        // 공유 상태 스위치 변경 시 로컬 설정 저장
+        if (switchShareStatus != null) {
+            switchShareStatus.setOnCheckedChangeListener((buttonView, isChecked) -> SettingsManager.setShareStatusEnabled(this, isChecked));
+        }
+
+        // 복약 누락 알림 스위치 변경 시 로컬 설정 저장
+        if (switchMissedAlert != null) {
+            switchMissedAlert.setOnCheckedChangeListener((buttonView, isChecked) -> SettingsManager.setMissedAlertEnabled(this, isChecked));
+        }
+    }
+
+
+    // 스위치 관련 영역 표시/숨김 처리
+    private void setSwitchSectionVisible(boolean visible) {
+        int visibility = visible ? View.VISIBLE : View.GONE;
+
+        if (layoutShareStatus != null) {
+            layoutShareStatus.setVisibility(visibility);
+        }
+        if (layoutMissedAlert != null) {
+            layoutMissedAlert.setVisibility(visibility);
+        }
+        if (dividerSwitch != null) {
+            dividerSwitch.setVisibility(visibility);
+        }
     }
 
     private void bindInitialState() {
@@ -189,6 +237,8 @@ public class GuardianLinkActivity extends AppCompatActivity {
         if (layoutDisconnect != null) {
             layoutDisconnect.setVisibility(View.GONE);
         }
+        // 초기 상태 : 스위치 영역 숨김
+        setSwitchSectionVisible(false);
     }
 
     private void fetchMyUserCode() {
@@ -268,7 +318,7 @@ public class GuardianLinkActivity extends AppCompatActivity {
         }).start();
     }
 
-    // 추가: 수락 API 호출
+    // 수락 API 호출
     private void submitAccept() {
         new Thread(() -> {
             try {
@@ -297,7 +347,7 @@ public class GuardianLinkActivity extends AppCompatActivity {
     }
 
 
-    // 추가: 거절 API 호출
+    // 거절 API 호출
     private void submitReject() {
         new Thread(() -> {
             try {
@@ -346,26 +396,27 @@ public class GuardianLinkActivity extends AppCompatActivity {
         }).start();
     }
 
+    @SuppressLint("SetTextI18n")
     private void renderCareLinkStatus(AuthApiClient.CareLinkStatusResponse response) {
         if (response == null || response.status == null || response.status.trim().isEmpty()) {
             renderEmptyState();
             return;
         }
-
-        // 추가: careLinkId 저장
+        // careLinkId 저장
         currentCareLinkId = response.id;
 
         String status = response.status.trim().toUpperCase();
         String protectedName = isEmpty(response.patientName) ? "이름 없음" : response.patientName;
         String guardianName = isEmpty(response.caregiverName) ? "이름 없음" : response.caregiverName;
 
-        // 기본: 수락/거절 버튼 숨기기
+        // 수락/거절 버튼 숨기기
         layoutAcceptReject.setVisibility(View.GONE);
 
         // 모든 케이스 시작 전 피보호자 달력 버튼 숨기기
         if (layoutViewPatientCalendar != null) {
             layoutViewPatientCalendar.setVisibility(View.GONE);
         }
+        setSwitchSectionVisible(false);
 
         switch (status) {
             case "PENDING":
@@ -389,8 +440,10 @@ public class GuardianLinkActivity extends AppCompatActivity {
                 tvProtectedUserStatus.setText("현재 연동 완료");
                 tvMyGuardianName.setText("연동된 보호자: " + guardianName);
                 tvMyGuardianStatus.setText("복약 현황을 함께 확인할 수 있어요");
-                // 추가: 연동 해제 버튼 표시
+                // 연동 해제 버튼 표시
                 layoutDisconnect.setVisibility(View.VISIBLE);
+                // ACTIVE 상태에서는 스위치 영역 표시
+                setSwitchSectionVisible(true);
 
                 // layoutViewPatientCalendar 사용
                 // 내가 보호자(caregiver)일 때만 피보호자 달력 버튼 표시
@@ -425,7 +478,6 @@ public class GuardianLinkActivity extends AppCompatActivity {
 
     private void renderEmptyState() {
         currentCareLinkId = -1L;
-        // currentPatientId, currentPatientName 초기화
         currentPatientId = -1L;
         currentPatientName = "";
         tvProtectedUserName.setText("보호 중인 사용자 없음");
@@ -442,6 +494,9 @@ public class GuardianLinkActivity extends AppCompatActivity {
         if (layoutViewPatientCalendar != null) {
             layoutViewPatientCalendar.setVisibility(View.GONE);
         }
+        // 연동 정보가 없으면 스위치 영역 숨김
+        setSwitchSectionVisible(false);
+
     }
     private void copyUserCode() {
         if (currentUserCode == null || currentUserCode.trim().isEmpty()) {

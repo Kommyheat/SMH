@@ -5,57 +5,85 @@
     android:id="@+id/scan_camera_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:background="@android:color/black">
 
-    <!-- 카메라 미리보기 영역 -->
+    <!-- 카메라 미리보기 영역: 상단 끝까지 확장 -->
+
+    <!-- 하단 컨트롤 영역 -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#222222"
+        android:background="@android:color/black"
         app:implementationMode="performance"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottom_bar"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/camera_control_bar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
         app:scaleType="fillCenter" />
 
-    <!-- 하단 바 -->
-    <LinearLayout
-        android:id="@+id/bottom_bar"
+    <!-- 로딩 오버레이 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/camera_control_bar"
         android:layout_width="0dp"
-        android:layout_height="96dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="16dp"
+        android:layout_height="100dp"
         android:background="@android:color/black"
+        android:paddingStart="24dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent">
 
+        <!-- 갤러리 버튼: 아이콘만 깔끔하게 -->
         <ImageButton
             android:id="@+id/btn_pick_image"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="@android:color/darker_gray"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent"
             android:contentDescription="이미지 불러오기"
-            android:src="@android:drawable/ic_menu_gallery" />
+            android:padding="0dp"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:tint="#9E9E9E"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <Space
-            android:layout_width="48dp"
-            android:layout_height="1dp" />
+        <!-- 촬영 버튼: 하단 중앙 -->
+        <FrameLayout
+            android:id="@+id/btn_capture_container"
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
-            android:id="@+id/btn_capture"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:background="@android:color/white"
-            android:src="@android:drawable/ic_menu_camera"
-            android:contentDescription="사진 촬영" />
-    </LinearLayout>
+            <!-- 바깥 흰 원 -->
+            <View
+                android:layout_width="66dp"
+                android:layout_height="66dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_camera_capture_outer" />
 
-    <!-- 로딩 오버레이 -->
+            <!-- 실제 클릭 버튼 -->
+            <ImageButton
+                android:id="@+id/btn_capture"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_camera_capture_inner"
+                android:contentDescription="사진 촬영"
+                android:src="@android:color/transparent" />
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <FrameLayout
         android:id="@+id/loading_overlay"
         android:layout_width="0dp"

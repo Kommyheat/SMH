@@ -118,7 +118,7 @@ public class CareLinkService {
                 .build();
     }
 
-    // 추가: POST /api/care-links/request 대응
+    // POST /api/care-links/request 대응
     // caregiverId + patientUserCode(=users.link_code) 로 연동 요청 생성
     @Transactional
     public MessageResponse requestCareLink(CareLinkRequestDto request) {
@@ -170,7 +170,7 @@ public class CareLinkService {
         return new MessageResponse("연동 요청을 보냈습니다.");
     }
 
-    // 추가: POST /api/care-links/accept 대응
+    // POST /api/care-links/accept 대응
     // careLinkId로 레코드 찾아 status = ACTIVE, linkedAt 설정
     @Transactional
     public MessageResponse acceptCareLink(CareLinkDecisionRequest request) {
@@ -181,7 +181,7 @@ public class CareLinkService {
         return new MessageResponse("연동 요청을 수락했습니다.");
     }
 
-    // 추가: POST /api/care-links/reject 대응
+    // POST /api/care-links/reject 대응
     // careLinkId로 레코드 찾아 status = REJECTED
     @Transactional
     public MessageResponse rejectCareLink(CareLinkDecisionRequest request) {

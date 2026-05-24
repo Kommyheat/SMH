@@ -45,19 +45,19 @@ public class CareLinkController {
         return ResponseEntity.ok(response);
     }
 
-    // 추가: 연동 요청
+    // 연동 요청
     @PostMapping("/request")
     public MessageResponse requestLink(@RequestBody CareLinkRequestDto request) {
         return careLinkService.requestCareLink(request);
     }
 
-    // 추가: 연동 수락
+    // 연동 수락
     @PostMapping("/accept")
     public MessageResponse acceptLink(@RequestBody CareLinkDecisionRequest request) {
         return careLinkService.acceptCareLink(request);
     }
 
-    // 추가: 연동 거절
+    // 연동 거절
     @PostMapping("/reject")
     public MessageResponse rejectLink(@RequestBody CareLinkDecisionRequest request) {
         return careLinkService.rejectCareLink(request);

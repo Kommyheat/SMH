@@ -24,10 +24,8 @@ public class ScheduleMedicineItem {
     // intake
     private Long scheduleId;
 
-    // 필드 추가
     private String memo;
 
-    // getter/setter 추가
     public String getMemo() {
         return memo != null ? memo : "";
     }

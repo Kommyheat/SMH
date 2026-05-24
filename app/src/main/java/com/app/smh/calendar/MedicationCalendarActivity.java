@@ -213,7 +213,7 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
             if (item.isCompletedOn(date)) {
                 detailView.setBackgroundResource(R.drawable.bg_schedule_item_done);
                 tvCategory.setTextColor(ContextCompat.getColor(this, android.R.color.white));
-                tvTime.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
+                tvTime.setTextColor(ContextCompat.getColor(this, R.color.white));
                 tvStatus.setText("완료");
                 tvStatus.setTextColor(ContextCompat.getColor(this, R.color.main_coral));
                 tvStatus.setBackgroundResource(R.drawable.bg_schedule_done_button_done);

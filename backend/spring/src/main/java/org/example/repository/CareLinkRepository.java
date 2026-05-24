@@ -25,7 +25,6 @@ public interface CareLinkRepository extends JpaRepository<CareLink, Long> {
     Optional<CareLink> findByIdAndCaregiverAndStatus(
             Long id, User caregiver, CareLinkStatus status);
 
-    // 추가: userId 기준으로 caregiver 또는 patient 로 연결된 최신 링크 조회
     @Query("SELECT c FROM CareLink c " +
             "WHERE c.caregiver = :user OR c.patient = :user " +
             "ORDER BY c.id DESC")

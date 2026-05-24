@@ -98,7 +98,6 @@ public class MyPageActivity extends AppCompatActivity {
         switchDarkMode = findViewById(R.id.switch_dark_mode);
         switchTts = findViewById(R.id.switch_tts);
 
-// 추가
         switchSeniorMode = findViewById(R.id.switch_senior_mode);
         layoutSeniorMode = findViewById(R.id.layout_senior_mode);
         layoutTts = findViewById(R.id.layout_tts);

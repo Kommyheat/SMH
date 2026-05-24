@@ -26,7 +26,7 @@ public class IntakeLogService {
         MedicationSchedule schedule = medicationScheduleRepository
                 .findByIdAndMedicationUserId(scheduleId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 복약 일정이 없거나 사용자 권한이 없습니다."));
-        // 로그 추가
+        // 로그
         System.out.println("[INTAKE] schedule found id=" + schedule.getId());
 
         IntakeLog log = intakeLogRepository
@@ -36,22 +36,21 @@ public class IntakeLogService {
 
                     return new IntakeLog(schedule, date);
                 });
-        // 로그 추가
+        // 로그
         System.out.println("[INTAKE] intakeLog prepared status=" + log.getStatus());
 
         log.markAsTaken(memo);
-    // 로그 추가
+        // 로그
         System.out.println("[INTAKE] markAsTaken complete status=" + log.getStatus());
         IntakeLog saved = intakeLogRepository.save(log);
         System.out.println("[INTAKE] save complete id=" + saved.getId());
 
-        // 추가: 모든 복용 완료 여부 체크 후 COMPLETED 변경
+        //  모든 복용 완료 여부 체크 후 COMPLETED 변경
         checkAndCompleteIfDone(schedule.getMedication());
         return saved.getId();
     }
-    /**
-     * 추가: 복용 기간 내 모든 스케줄이 TAKEN이면 medication.status = COMPLETED
-     */
+
+    // 복용 기간 내 모든 스케줄이 TAKEN이면 medication.status = COMPLETED
     private void checkAndCompleteIfDone(Medication medication) {
         LocalDate startDate = medication.getStartDate();
         LocalDate endDate = medication.getEndDate();
@@ -99,7 +98,7 @@ public class IntakeLogService {
         IntakeLog log = intakeLogRepository
                 .findByMedicationSchedule_IdAndDate(scheduleId, date)
                 .orElseThrow(() -> new IllegalArgumentException("복약 기록이 없습니다."));
-        // 로그 추가
+        // 로그
         System.out.println("[INTAKE] intake log found id=" + log.getId());
         log.cancelTaken();
         System.out.println("[INTAKE] cancelTaken complete");

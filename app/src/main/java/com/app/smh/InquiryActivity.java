@@ -1,6 +1,5 @@
 package com.app.smh;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
@@ -109,7 +108,7 @@ public class InquiryActivity extends AppCompatActivity {
 
         String fullEmail = emailLocal + "@" + emailDomain;
 
-        // TODO: 백엔드 문의 API 연동 시 여기에 추가
+        // 백엔드 문의 API 연동 시 여기에
         // 현재는 완료 토스트만 표시
         Toast.makeText(this, "문의가 접수되었습니다.", Toast.LENGTH_SHORT).show();
         finish();

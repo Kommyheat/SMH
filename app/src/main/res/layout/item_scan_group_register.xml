@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="20dp"
     android:layout_marginTop="12dp"
-    app:cardCornerRadius="18dp"
-    app:cardElevation="2dp">
+    app:cardCornerRadius="15dp"
+    app:cardElevation="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,6 +39,7 @@
             android:id="@+id/tv_group_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:text="감기약"
             android:textColor="#111111"
             android:textSize="18sp"
@@ -48,7 +49,7 @@
             android:id="@+id/tv_drug_names"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="15dp"
             android:text="코미정, 슈다페드정"
             android:textColor="#666666"
             android:textSize="14sp" />
@@ -56,7 +57,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="13dp"
+            android:layout_marginTop="15dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
@@ -86,7 +87,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="#F4F4F4"
+                android:background="@drawable/bg_date_field"
                 android:padding="12dp"
                 android:text="2026-05-01"
                 android:textColor="#111111" />
@@ -100,7 +101,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="#F4F4F4"
+                android:background="@drawable/bg_date_field"
                 android:padding="12dp"
                 android:text="2026-05-05"
                 android:textColor="#111111" />
@@ -141,21 +142,27 @@
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="아침" />
+                android:text="아침"
+                android:textColor="@color/chip_time_text_selector"
+                app:chipBackgroundColor="@color/chip_time_bg_selector"/>
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_lunch"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="점심" />
+                android:text="점심"
+                android:textColor="@color/chip_time_text_selector"
+                app:chipBackgroundColor="@color/chip_time_bg_selector"/>
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_dinner"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="저녁" />
+                android:text="저녁"
+                android:textColor="@color/chip_time_text_selector"
+                app:chipBackgroundColor="@color/chip_time_bg_selector"/>
         </com.google.android.material.chip.ChipGroup>
 
         <TextView

@@ -150,7 +150,7 @@ public class AuthApiClient {
         return gson.fromJson(response, MessageResponse.class);
     }
 
-    // 현재 관계 상태를 care_links.status 기반으로 조회하기 위한 메서드 추가
+    // 현재 관계 상태를 care_links.status 기반으로 조회하기 위한 메서드
     public CareLinkStatusResponse getCareLinkStatus(long userId) throws IOException, ApiException {
         Request httpRequest = new Request.Builder()
                 .url(baseUrl + "/api/care-links/status?userId=" + userId)
@@ -208,7 +208,7 @@ public class AuthApiClient {
                 + "?userId=" + userId
                 + "&timeSlot=" + timeSlot;
 
-        android.util.Log.d("DeleteAPI", "호출 URL: " + url);  // 추가
+        android.util.Log.d("DeleteAPI", "호출 URL: " + url);
 
         Request httpRequest = new Request.Builder()
                 .url(url)
@@ -379,7 +379,7 @@ public class AuthApiClient {
         return gson.fromJson(response, Long.class);
     }
 
-    // DTO 추가
+    // DTO
     public static class MedicationSaveRequest {
         public Long userId;
         public String medicationName;
@@ -434,7 +434,7 @@ public class AuthApiClient {
         execute(httpRequest);
     }
 
-    // DTO 추가
+    // DTO
     public static class MedicationScheduleResponse {
         public long id;           // scheduleId
         public long medicationId;
@@ -492,7 +492,7 @@ public class AuthApiClient {
         return gson.fromJson(response, type);
     }
 
-    // DTO 추가
+    // DTO
     public static class PatientIntakeStatusResponse {
         public long patientId;
         public String patientName;
@@ -562,7 +562,7 @@ public class AuthApiClient {
         execute(httpRequest);
     }
 
-    // DTO 추가
+    // DTO
     public static class MedicationStatusChangeRequest {
         public Long userId;
         public String status;

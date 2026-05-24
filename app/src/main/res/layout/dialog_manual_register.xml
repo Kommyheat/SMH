@@ -98,7 +98,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#F4F4F4"
+            android:background="@drawable/bg_date_field"
             android:padding="12dp"
             android:text="시작일 선택"
             android:textColor="#111111" />
@@ -112,7 +112,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="#F4F4F4"
+            android:background="@drawable/bg_date_field"
             android:padding="12dp"
             android:text="종료일 선택"
             android:textColor="#111111" />

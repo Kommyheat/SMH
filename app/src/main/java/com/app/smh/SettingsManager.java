@@ -296,4 +296,21 @@ public class SettingsManager {
                 return "00:00:00";
         }
     }
+    // 보호자 내용 공유 관련
+    private static final String KEY_SHARE_STATUS = "key_share_status";
+    private static final String KEY_MISSED_ALERT = "key_missed_alert";
+
+    public static void setShareStatusEnabled(Context context, boolean enabled) {
+        getPrefs(context).edit().putBoolean(KEY_SHARE_STATUS, enabled).apply();
+    }
+    public static boolean isShareStatusEnabled(Context context) {
+        return getPrefs(context).getBoolean(KEY_SHARE_STATUS, true);
+    }
+
+    public static void setMissedAlertEnabled(Context context, boolean enabled) {
+        getPrefs(context).edit().putBoolean(KEY_MISSED_ALERT, enabled).apply();
+    }
+    public static boolean isMissedAlertEnabled(Context context) {
+        return getPrefs(context).getBoolean(KEY_MISSED_ALERT, false);
+    }
 }

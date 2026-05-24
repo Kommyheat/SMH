@@ -116,7 +116,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                             tvLunchTime.setText(to12HourDisplay(time24));
                             AlarmScheduler.scheduleAll(this);
 
-                            // 추가: 서버 스케줄 시간 업데이트
+                            // 서버 스케줄 시간 업데이트
                             MedicationServerSync.updateScheduleTimeBySlot(this, "LUNCH", time24);
                         })
         );
@@ -131,7 +131,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                             tvDinnerTime.setText(to12HourDisplay(time24));
                             AlarmScheduler.scheduleAll(this);
 
-                            // 추가: 서버 스케줄 시간 업데이트
+                            // 서버 스케줄 시간 업데이트
                             MedicationServerSync.updateScheduleTimeBySlot(this, "DINNER", time24);
                         })
         );

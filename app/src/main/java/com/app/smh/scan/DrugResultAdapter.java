@@ -81,7 +81,7 @@ public class DrugResultAdapter extends RecyclerView.Adapter<DrugResultAdapter.Dr
                     currentItem.setAtpnWarnQesitm(result.getAtpnWarnQesitm());
                     currentItem.setDepositMethodQesitm(result.getDepositMethodQesitm());
 
-                    // 추가: 캐시에 저장 (약품명 → 상세정보)
+                    // 캐시에 저장 (약품명 → 상세정보)
                     DrugDetailCache.getInstance().put(currentItem.getRecognizedName(), result);
                     notifyItemChanged(currentPosition);
                 }

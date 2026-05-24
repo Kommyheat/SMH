@@ -93,7 +93,7 @@ public class MedicationServerSync {
                     return;
                 }
 
-                // 로그추가
+                // 로그
                 Map<Long, AuthApiClient.MedicationResponse> medMap = new HashMap<>();
                 if (medications != null) {
                     for (AuthApiClient.MedicationResponse med : medications) {
@@ -348,7 +348,7 @@ public class MedicationServerSync {
                     try {
                         if (medications != null) {
                             for (AuthApiClient.MedicationResponse med : medications) {
-                                //로그 추가
+                                // 로그
                                 android.util.Log.d("DeleteBatch",
                                         "서버약: " + med.medicationName
                                                 + " startDate: " + med.startDate

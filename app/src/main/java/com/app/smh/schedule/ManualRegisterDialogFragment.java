@@ -152,11 +152,11 @@ public class ManualRegisterDialogFragment extends DialogFragment {
 
                             // 기존: 로컬 저장 (유지)
                             ScheduleRepository.addSchedule(requireContext(), item);
-                            savedItems.add(item); // 추가
+                            savedItems.add(item);
                         }
 
 
-                        // 추가: 서버 저장 (비동기, 실패해도 영향 없음)
+                        // 서버 저장 (비동기, 실패해도 영향 없음)
                         MedicationServerSync.syncToServer(requireContext(), savedItems);
 
                         Toast.makeText(requireContext(),
