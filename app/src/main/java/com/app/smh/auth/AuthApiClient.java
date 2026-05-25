@@ -51,6 +51,50 @@ public class AuthApiClient {
         return gson.fromJson(response, LoginResponse.class);
     }
 
+    public LoginResponse loginWithGoogle(GoogleLoginRequest request) throws IOException, ApiException {
+        String body = gson.toJson(request);
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/api/auth/social/google")
+                .post(RequestBody.create(body, JSON))
+                .build();
+
+        String response = execute(httpRequest);
+        return gson.fromJson(response, LoginResponse.class);
+    }
+
+    public LoginResponse loginWithKakao(KakaoLoginRequest request) throws IOException, ApiException {
+        String body = gson.toJson(request);
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/api/auth/social/kakao")
+                .post(RequestBody.create(body, JSON))
+                .build();
+
+        String response = execute(httpRequest);
+        return gson.fromJson(response, LoginResponse.class);
+    }
+
+    public LoginResponse loginWithNaver(NaverLoginRequest request) throws IOException, ApiException {
+        String body = gson.toJson(request);
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/api/auth/social/naver")
+                .post(RequestBody.create(body, JSON))
+                .build();
+
+        String response = execute(httpRequest);
+        return gson.fromJson(response, LoginResponse.class);
+    }
+
+    public LoginResponse completeSocialProfile(SocialProfileCompleteRequest request) throws IOException, ApiException {
+        String body = gson.toJson(request);
+        Request httpRequest = new Request.Builder()
+                .url(baseUrl + "/api/auth/social/complete-profile")
+                .post(RequestBody.create(body, JSON))
+                .build();
+
+        String response = execute(httpRequest);
+        return gson.fromJson(response, LoginResponse.class);
+    }
+
     public boolean checkLoginIdAvailable(String loginId) throws IOException, ApiException {
         Request httpRequest = new Request.Builder()
                 .url(baseUrl + "/api/auth/check-login-id?loginId=" + loginId)
@@ -237,12 +281,31 @@ public class AuthApiClient {
         public String password;
     }
 
+    public static class GoogleLoginRequest {
+        public String idToken;
+    }
+
+    public static class KakaoLoginRequest {
+        public String accessToken;
+    }
+
+    public static class NaverLoginRequest {
+        public String accessToken;
+    }
+
     public static class LoginResponse {
         public long id;
         public String loginId;
         public String name;
         public String birthDate;
         public String email;
+        public boolean profileCompleted;
+    }
+
+    public static class SocialProfileCompleteRequest {
+        public long userId;
+        public String name;
+        public String birthDate;
     }
 
     public static class MessageResponse {

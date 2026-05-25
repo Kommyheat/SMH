@@ -1,9 +1,12 @@
 package com.app.smh;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.CancellationSignal;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -26,13 +29,30 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.credentials.Credential;
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CredentialManagerCallback;
+import androidx.credentials.CustomCredential;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialException;
 
 import com.app.smh.auth.AuthApiClient;
 import com.app.smh.schedule.MedicationServerSync;
 import com.app.smh.schedule.ScheduleRepository;
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.kakao.sdk.auth.model.OAuthToken;
+import com.kakao.sdk.common.KakaoSdk;
+import com.kakao.sdk.common.model.ClientError;
+import com.kakao.sdk.common.model.ClientErrorCause;
+import com.kakao.sdk.user.UserApiClient;
+import com.navercorp.nid.NidOAuth;
+import com.navercorp.nid.oauth.util.NidOAuthCallback;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -49,6 +69,8 @@ public class LoginActivity extends AppCompatActivity {
     private ImageButton btnNaverLogin;
 
     private AuthApiClient authApiClient;
+    private CredentialManager credentialManager;
+    private Executor mainExecutor;
 
     private final TextWatcher loginTextWatcher = new TextWatcher() {
         @Override
@@ -70,6 +92,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         authApiClient = new AuthApiClient();
+        credentialManager = CredentialManager.create(this);
+        mainExecutor = ContextCompat.getMainExecutor(this);
+        KakaoSdk.init(getApplicationContext(), BuildConfig.KAKAO_NATIVE_APP_KEY);
 
         initViews();
         setupListeners();
@@ -103,9 +128,9 @@ public class LoginActivity extends AppCompatActivity {
         }
         if (tvFindId != null) tvFindId.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, FindIdActivity.class)));
         if (tvFindPassword != null) tvFindPassword.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, FindPasswordActivity.class)));
-        if (btnGoogleLogin != null) btnGoogleLogin.setOnClickListener(v -> handleSocialLogin("Google"));
-        if (btnKakaoLogin != null) btnKakaoLogin.setOnClickListener(v -> handleSocialLogin("Kakao"));
-        if (btnNaverLogin != null) btnNaverLogin.setOnClickListener(v -> handleSocialLogin("Naver"));
+        if (btnGoogleLogin != null) btnGoogleLogin.setOnClickListener(v -> attemptGoogleLogin());
+        if (btnKakaoLogin != null) btnKakaoLogin.setOnClickListener(v -> attemptKakaoLogin());
+        if (btnNaverLogin != null) btnNaverLogin.setOnClickListener(v -> attemptNaverLogin());
     }
 
     private void updateLoginButtonState() {
@@ -142,33 +167,7 @@ public class LoginActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 AuthApiClient.LoginResponse response = authApiClient.login(request);
-                runOnUiThread(() -> {
-                    // 로그인 세션 저장 (기존 유지)
-                    SettingsManager.saveLoginSession(this, response.id, response.loginId, response.name);
-
-                    if (response.birthDate != null) {
-                        SettingsManager.setBirthDate(this, response.birthDate);
-                    }
-                    if (response.email != null) {
-                        SettingsManager.setEmail(this, response.email);
-                    }
-                    // 자동 로그인 체크 여부 처리 (기존 유지)
-                    if (autoLoginChecked) {
-                        SettingsManager.saveAutoLoginCredentials(this, id, password);
-                    } else {
-                        SettingsManager.clearAutoLoginCredentials(this);
-                    }
-
-                    Toast.makeText(this, response.name + "님, 환영합니다.", Toast.LENGTH_SHORT).show();
-
-                    // 서버에서 복약 스케줄 불러와서 로컬 동기화 후 메인으로 이동
-                    MedicationServerSync.syncFromServer(this, () ->
-                            runOnUiThread(() -> {
-                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                finish();
-                            })
-                    );
-                });
+                runOnUiThread(() -> onLoginSuccess(response, autoLoginChecked, id, password));
             } catch (IOException e) {
                 runOnUiThread(() -> Toast.makeText(this, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show());
             } catch (AuthApiClient.ApiException e) {
@@ -257,14 +256,266 @@ public class LoginActivity extends AppCompatActivity {
         return birthDate.matches("^\\d{4}-\\d{2}-\\d{2}$");
     }
 
-    private boolean isValidEmailFormat(String email) {
-        return email != null && Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    private void attemptNaverLogin() {
+        NidOAuth.INSTANCE.initialize(
+                this,
+                BuildConfig.NAVER_CLIENT_ID,
+                BuildConfig.NAVER_CLIENT_SECRET,
+                BuildConfig.NAVER_CLIENT_NAME,
+                null
+        );
+
+        NidOAuth.INSTANCE.requestLogin(this, new NidOAuthCallback() {
+            @Override
+            public void onSuccess() {
+                String accessToken = NidOAuth.INSTANCE.getAccessToken();
+                if (accessToken == null || accessToken.trim().isEmpty()) {
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "네이버 토큰을 받지 못했습니다.", Toast.LENGTH_SHORT).show());
+                    return;
+                }
+                loginWithNaverToken(accessToken);
+            }
+
+            @Override
+            public void onFailure(String errorCode, String errorDesc) {
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "네이버 로그인에 실패했습니다.", Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
-    private void handleSocialLogin(String provider) {
-        Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-        intent.putExtra("social_provider", provider);
-        startActivity(intent);
+    private void attemptKakaoLogin() {
+
+        kotlin.jvm.functions.Function2<OAuthToken, Throwable, kotlin.Unit> accountCallback =
+                new kotlin.jvm.functions.Function2<OAuthToken, Throwable, kotlin.Unit>() {
+            @Override
+            public kotlin.Unit invoke(OAuthToken token, Throwable error) {
+                if (error != null) {
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "카카오 로그인에 실패했습니다.", Toast.LENGTH_SHORT).show());
+                } else if (token != null) {
+                    loginWithKakaoToken(token.getAccessToken());
+                } else {
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "카카오 토큰을 받지 못했습니다.", Toast.LENGTH_SHORT).show());
+                }
+                return kotlin.Unit.INSTANCE;
+            }
+        };
+
+        if (UserApiClient.getInstance().isKakaoTalkLoginAvailable(this)) {
+            UserApiClient.getInstance().loginWithKakaoTalk(this, (token, error) -> {
+                if (error != null) {
+                    if (error instanceof ClientError
+                            && ((ClientError) error).getReason() == ClientErrorCause.Cancelled) {
+                        return kotlin.Unit.INSTANCE;
+                    }
+                    UserApiClient.getInstance().loginWithKakaoAccount(LoginActivity.this, accountCallback);
+                } else if (token != null) {
+                    loginWithKakaoToken(token.getAccessToken());
+                } else {
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "카카오 토큰을 받지 못했습니다.", Toast.LENGTH_SHORT).show());
+                }
+                return kotlin.Unit.INSTANCE;
+            });
+        } else {
+            UserApiClient.getInstance().loginWithKakaoAccount(this, accountCallback);
+        }
+    }
+
+    private void attemptGoogleLogin() {
+
+        GetSignInWithGoogleOption googleIdOption = new GetSignInWithGoogleOption.Builder(
+                BuildConfig.GOOGLE_WEB_CLIENT_ID
+        )
+                .build();
+
+        GetCredentialRequest request = new GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build();
+
+        CancellationSignal cancellationSignal = new CancellationSignal();
+        credentialManager.getCredentialAsync(
+                this,
+                request,
+                cancellationSignal,
+                mainExecutor,
+                new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                    @Override
+                    public void onResult(GetCredentialResponse result) {
+                        handleGoogleCredential(result.getCredential());
+                    }
+
+                    @Override
+                    public void onError(GetCredentialException e) {
+                        Toast.makeText(LoginActivity.this, "구글 로그인에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+    }
+
+    private void handleGoogleCredential(Credential credential) {
+        if (!(credential instanceof CustomCredential customCredential)) {
+            Toast.makeText(this, "구글 로그인 정보 형식이 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(customCredential.getType())) {
+            Toast.makeText(this, "지원하지 않는 구글 로그인 타입입니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            GoogleIdTokenCredential googleCredential = GoogleIdTokenCredential.createFrom(customCredential.getData());
+            String idToken = googleCredential.getIdToken();
+            if (idToken.trim().isEmpty()) {
+                Toast.makeText(this, "구글 토큰을 받지 못했습니다.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            loginWithGoogleToken(idToken);
+        } catch (Exception e) {
+            Toast.makeText(this, "구글 계정 정보를 해석하지 못했습니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loginWithGoogleToken(String idToken) {
+        new Thread(() -> {
+            try {
+                AuthApiClient.GoogleLoginRequest request = new AuthApiClient.GoogleLoginRequest();
+                request.idToken = idToken;
+                AuthApiClient.LoginResponse response = authApiClient.loginWithGoogle(request);
+                runOnUiThread(() -> {
+                    if (response.profileCompleted) {
+                        onLoginSuccess(response, false, null, null);
+                    } else {
+                        showGoogleProfileCompletionDialog(response);
+                    }
+                });
+            } catch (IOException e) {
+                runOnUiThread(() -> Toast.makeText(this, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show());
+            } catch (AuthApiClient.ApiException e) {
+                runOnUiThread(() -> Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
+    private void loginWithKakaoToken(String accessToken) {
+        new Thread(() -> {
+            try {
+                AuthApiClient.KakaoLoginRequest request = new AuthApiClient.KakaoLoginRequest();
+                request.accessToken = accessToken;
+                AuthApiClient.LoginResponse response = authApiClient.loginWithKakao(request);
+                runOnUiThread(() -> {
+                    if (response.profileCompleted) {
+                        onLoginSuccess(response, false, null, null);
+                    } else {
+                        showGoogleProfileCompletionDialog(response);
+                    }
+                });
+            } catch (IOException e) {
+                runOnUiThread(() -> Toast.makeText(this, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show());
+            } catch (AuthApiClient.ApiException e) {
+                runOnUiThread(() -> Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
+    private void loginWithNaverToken(String accessToken) {
+        new Thread(() -> {
+            try {
+                AuthApiClient.NaverLoginRequest request = new AuthApiClient.NaverLoginRequest();
+                request.accessToken = accessToken;
+                AuthApiClient.LoginResponse response = authApiClient.loginWithNaver(request);
+                runOnUiThread(() -> {
+                    if (response.profileCompleted) {
+                        onLoginSuccess(response, false, null, null);
+                    } else {
+                        showGoogleProfileCompletionDialog(response);
+                    }
+                });
+            } catch (IOException e) {
+                runOnUiThread(() -> Toast.makeText(this, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show());
+            } catch (AuthApiClient.ApiException e) {
+                runOnUiThread(() -> Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
+    private void showGoogleProfileCompletionDialog(AuthApiClient.LoginResponse loginResponse) {
+        EditText nameInput = createDialogInput("이름");
+        EditText birthInput = createDialogInput("생년월일 (YYYY-MM-DD)");
+        applyBirthDateAutoFormat(birthInput);
+
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setTitle("추가 정보 입력")
+                .setMessage("소셜 로그인 후 서비스 이용을 위해 이름과 생년월일을 입력해주세요.")
+                .setView(createDialogLayout(nameInput, birthInput))
+                .setCancelable(false)
+                .setPositiveButton("완료", null)
+                .create();
+        dialog.show();
+
+        android.widget.Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        if (positiveButton == null) return;
+        positiveButton.setOnClickListener(v -> {
+            String name = getTrimmedText(nameInput);
+            String birthDate = getTrimmedText(birthInput);
+
+            if (name.isEmpty()) {
+                nameInput.setError("이름을 입력해주세요.");
+                nameInput.requestFocus();
+                return;
+            }
+            if (!isValidBirthDateFormat(birthDate)) {
+                birthInput.setError("생년월일 형식은 YYYY-MM-DD 입니다.");
+                birthInput.requestFocus();
+                return;
+            }
+
+            new Thread(() -> {
+                try {
+                    AuthApiClient.SocialProfileCompleteRequest request = new AuthApiClient.SocialProfileCompleteRequest();
+                    request.userId = loginResponse.id;
+                    request.name = name;
+                    request.birthDate = birthDate;
+
+                    AuthApiClient.LoginResponse completed = authApiClient.completeSocialProfile(request);
+                    runOnUiThread(() -> {
+                        dialog.dismiss();
+                        Toast.makeText(this, "추가 정보가 저장되었습니다.", Toast.LENGTH_SHORT).show();
+                        onLoginSuccess(completed, false, null, null);
+                    });
+                } catch (IOException e) {
+                    runOnUiThread(() -> Toast.makeText(this, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show());
+                } catch (AuthApiClient.ApiException e) {
+                    runOnUiThread(() -> Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            }).start();
+        });
+    }
+
+    private void onLoginSuccess(AuthApiClient.LoginResponse response,
+                                boolean autoLoginChecked,
+                                String loginId,
+                                String password) {
+        SettingsManager.saveLoginSession(this, response.id, response.loginId, response.name);
+
+        if (response.birthDate != null) {
+            SettingsManager.setBirthDate(this, response.birthDate);
+        }
+        if (response.email != null) {
+            SettingsManager.setEmail(this, response.email);
+        }
+
+        if (autoLoginChecked && loginId != null && password != null) {
+            SettingsManager.saveAutoLoginCredentials(this, loginId, password);
+        } else {
+            SettingsManager.clearAutoLoginCredentials(this);
+        }
+
+        Toast.makeText(this, response.name + "님, 환영합니다.", Toast.LENGTH_SHORT).show();
+        MedicationServerSync.syncFromServer(this, () ->
+                runOnUiThread(() -> {
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
+                })
+        );
     }
 
     private String getTrimmedText(EditText editText) {
@@ -282,6 +533,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setupPasswordToggle(EditText editText) {
         if (editText == null) return;
         editText.setTag(R.id.et_login_password, false);
@@ -308,15 +560,5 @@ public class LoginActivity extends AppCompatActivity {
             editText.setTag(R.id.et_login_password, nextVisible);
             return true;
         });
-    }
-
-    private void copyTemporaryPassword(String temporaryPassword) {
-        if (temporaryPassword == null || temporaryPassword.trim().isEmpty()) return;
-
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        if (clipboard == null) return;
-
-        ClipData clipData = ClipData.newPlainText("임시 비밀번호", temporaryPassword);
-        clipboard.setPrimaryClip(clipData);
     }
 }
