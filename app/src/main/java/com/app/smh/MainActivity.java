@@ -279,9 +279,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showHomeContent() {
-        if (mainScroll != null) mainScroll.setVisibility(View.VISIBLE);
-        if (fragmentContainer != null) fragmentContainer.setVisibility(View.GONE);
-        if (fabChatbot != null) fabChatbot.setVisibility(View.VISIBLE);
+
+        View topAppBar = findViewById(R.id.top_app_bar);
+
+        if (topAppBar != null) {
+            topAppBar.setVisibility(View.VISIBLE);
+        }
+
+        if (mainScroll != null) {
+            mainScroll.setVisibility(View.VISIBLE);
+        }
+
+        if (fragmentContainer != null) {
+            fragmentContainer.setVisibility(View.GONE);
+        }
+
+        if (fabChatbot != null) {
+            fabChatbot.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showScanFragment() {
