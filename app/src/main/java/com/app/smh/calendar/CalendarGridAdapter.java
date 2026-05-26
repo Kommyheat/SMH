@@ -1,6 +1,7 @@
 package com.app.smh.calendar;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,9 +71,17 @@ public class CalendarGridAdapter extends BaseAdapter {
         CalendarDayItem item = items.get(position);
         Context context = parent.getContext();
 
+        int nightMode = context.getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK;
+
+        boolean isDarkMode = nightMode == Configuration.UI_MODE_NIGHT_YES;
+
         tvDay.setText("");
         tvDay.setBackgroundResource(0);
-        tvDay.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+        tvDay.setTextColor(ContextCompat.getColor(
+                context,
+                isDarkMode ? android.R.color.white : android.R.color.black
+        ));
         dotDone.setVisibility(View.INVISIBLE);
         view.setOnClickListener(null);
         view.setEnabled(true);
@@ -106,7 +115,10 @@ public class CalendarGridAdapter extends BaseAdapter {
             } else if (dayOfWeek == Calendar.SATURDAY) {
                 tvDay.setTextColor(0xFF5B6EE1);
             } else {
-                tvDay.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                tvDay.setTextColor(ContextCompat.getColor(
+                        context,
+                        isDarkMode ? android.R.color.white : android.R.color.black
+                ));
             }
         }
 

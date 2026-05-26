@@ -177,7 +177,7 @@
                 android:layout_marginBottom="10dp"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="16dp"
-                app:strokeColor="#DDDDDD"
+                app:strokeColor="@color/light_gray"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -446,7 +446,7 @@
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:layout_gravity="center_horizontal"
-                        android:background="#FFFFFF"
+                        android:background="@drawable/bg_add_button"
                         android:src="@android:drawable/ic_input_add"
                         android:contentDescription="복약 추가"
                         app:tint="@color/dark_gray" />

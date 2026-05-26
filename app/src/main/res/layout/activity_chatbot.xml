@@ -49,7 +49,7 @@
         android:id="@+id/chat_scroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#EEF3F8"
+        android:background="@color/white"
         android:fillViewport="true"
         android:paddingStart="14dp"
         android:paddingTop="8dp"
@@ -326,7 +326,7 @@
             android:id="@+id/btn_send_chat"
             android:layout_width="46dp"
             android:layout_height="44dp"
-            android:background="@color/white"
+            android:background="@color/light_gray"
             android:layout_marginStart="6dp"
             android:contentDescription="전송"
             app:srcCompat="@drawable/ic_send" />

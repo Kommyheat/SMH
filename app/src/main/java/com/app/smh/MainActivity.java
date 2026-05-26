@@ -3,6 +3,7 @@ package com.app.smh;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -103,6 +104,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         initViews();
+        TextView logoTitle = findViewById(R.id.tv_logo_title);
+
+        int nightMode = getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK;
+
+        if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
+            logoTitle.setVisibility(View.GONE);
+        } else {
+            logoTitle.setVisibility(View.VISIBLE);
+        }
+
         setupBottomNavigation();
         setupFabChatbot();
         setupCalendarButton();
