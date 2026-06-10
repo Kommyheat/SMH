@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_swipe_foreground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/bg_schedule_item_pending"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="14dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="8dp">
+
+    <!-- 체크박스 (선택 모드에서만 표시) -->
+    <CheckBox
+        android:id="@+id/checkbox_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:buttonTint="@color/white"
+        android:visibility="gone" />
+
+    <!-- 약 이름 -->
+    <TextView
+        android:id="@+id/tv_category_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="감기약"
+        android:textColor="@color/dark_gray"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_quantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1정"
+        android:textColor="@color/dark_gray"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <!-- 완료/미완료 버튼 -->
+    <TextView
+        android:id="@+id/btn_take_done"
+        android:layout_width="72dp"
+        android:layout_height="34dp"
+        android:background="@drawable/bg_schedule_done_button_pending"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="미완료"
+        android:textColor="@color/dark_gray"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

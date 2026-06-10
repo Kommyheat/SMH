@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- 내부 저장소 -->
+    <files-path
+        name="internal_files"
+        path="." />
+
+    <!-- 캐시 디렉토리 (카메라 임시 파일) -->
+    <ache-path
+    name="cache_files"
+    path="." />
+
+    <!-- 외부 캐시 -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
+</paths>

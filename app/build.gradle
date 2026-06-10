@@ -1,0 +1,106 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(new FileInputStream(localPropertiesFile))
+}
+
+android {
+    namespace 'com.app.smh'
+    compileSdk {
+        version = release(36) {
+            minorApiLevel = 1
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.app.smh"
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+        def serverBaseUrl = localProperties.getProperty("SERVER_BASE_URL", "http://10.0.2.2:8080")
+        def publicDataApiKey = localProperties.getProperty(
+                "PublicData_API_KEY",
+                localProperties.getProperty("PublicDATA_API_KEY", "protect")
+        )
+        def geminiApiKey = localProperties.getProperty("GEMINI_API_KEY", "protect")
+        def googleWebClientId = localProperties.getProperty("GOOGLE_WEB_CLIENT_ID", "protect")
+        def kakaoNativeAppKey = localProperties.getProperty("KAKAO_NATIVE_APP_KEY", "protect")
+        def naverClientId = localProperties.getProperty("NAVER_CLIENT_ID", "protect")
+        def naverClientSecret = localProperties.getProperty("NAVER_CLIENT_SECRET", "protect")
+        def naverClientName = localProperties.getProperty("NAVER_CLIENT_NAME", "SMH")
+        publicDataApiKey = publicDataApiKey.replace("\"", "").trim()
+        geminiApiKey = geminiApiKey.replace("\"", "").trim()
+        googleWebClientId = googleWebClientId.replace("\"", "").trim()
+        kakaoNativeAppKey = kakaoNativeAppKey.replace("\"", "").trim()
+        naverClientId = naverClientId.replace("\"", "").trim()
+        naverClientSecret = naverClientSecret.replace("\"", "").trim()
+        naverClientName = naverClientName.replace("\"", "").trim()
+
+        buildConfigField "String", "SERVER_BASE_URL", "\"${serverBaseUrl}\""
+        buildConfigField "String", "PublicDATA_API_KEY", "\"${publicDataApiKey}\""
+        buildConfigField "String", "GEMINI_API_KEY", "\"${geminiApiKey}\""
+        buildConfigField "String", "GOOGLE_WEB_CLIENT_ID", "\"${googleWebClientId}\""
+        buildConfigField "String", "KAKAO_NATIVE_APP_KEY", "\"${kakaoNativeAppKey}\""
+        buildConfigField "String", "NAVER_CLIENT_ID", "\"${naverClientId}\""
+        buildConfigField "String", "NAVER_CLIENT_SECRET", "\"${naverClientSecret}\""
+        buildConfigField "String", "NAVER_CLIENT_NAME", "\"${naverClientName}\""
+        manifestPlaceholders["KAKAO_SCHEME"] = "kakao${kakaoNativeAppKey}"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+}
+
+dependencies {
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+
+    implementation libs.camera.core // 카메라 (16KB Alignment Fix)
+    implementation libs.camera.camera2
+    implementation libs.camera.lifecycle
+    implementation libs.camera.view
+    implementation libs.generativeai // Gemini Developer SDK/API 의존성
+    implementation libs.guava
+    implementation libs.okhttp
+    implementation libs.gson
+    implementation libs.ucrop
+    implementation libs.credentials
+    implementation libs.credentials.play.services.auth
+    implementation libs.googleid
+    implementation libs.v2.user
+    implementation libs.naver.oauth
+
+    implementation 'androidx.work:work-runtime:2.9.0'
+
+}
+
+tasks.withType(JavaCompile).configureEach { // deprecated API 사용 위치를 자세히 보기 위한 Java 컴파일 옵션
+    options.compilerArgs << "-Xlint:deprecation"
+}

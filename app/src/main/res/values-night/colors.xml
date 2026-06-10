@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="white">#FF3F3F3F</color>
+
+    <color name="black">#FFFFFFFF</color>
+
+    <color name="light_gray">#FF4B4B4B</color>
+
+    <color name="dark_gray">#FFD0D0D0</color>
+
+    <color name="main_coral">#FFE78D82</color>
+
+    <color name="nav_selected">#FFE78D82</color>
+
+    <color name="nav_unselected">#FFD0D0D0</color>
+
+</resources>
