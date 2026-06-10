@@ -22,7 +22,6 @@ import android.net.Uri;
 import java.io.File;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 
@@ -32,7 +31,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 
-public class MyPageActivity extends AppCompatActivity {
+public class MyPageActivity extends BaseActivity {
 
     private BottomNavigationView bottomNavigationView;
     private LinearLayout layoutHomeMessage;
@@ -277,22 +276,19 @@ public class MyPageActivity extends AppCompatActivity {
                     switchTts.setChecked(true);
 
                     // 최대 글자 크기 적용
+                    SettingsManager.setPreSeniorFontScale(this, SettingsManager.getFontScale(this));
                     SettingsManager.setFontScale(this, 1.5f);
-                    android.content.res.Configuration config =
-                            new android.content.res.Configuration(
-                                    getResources().getConfiguration());
-                    config.fontScale = 1.5f;
-                    getResources().updateConfiguration(
-                            config, getResources().getDisplayMetrics());
 
                     Toast.makeText(this,
                             "고령자 모드가 활성화되었습니다.", Toast.LENGTH_SHORT).show();
                 } else {
+                    SettingsManager.setFontScale(this, SettingsManager.getPreSeniorFontScale(this));
                     Toast.makeText(this,
                             "고령자 모드가 비활성화되었습니다.", Toast.LENGTH_SHORT).show();
                 }
 
                 applySeniorModeUi(isChecked);
+                SmhApplication.refreshUi(MyPageActivity.this);
             });
         }
     }

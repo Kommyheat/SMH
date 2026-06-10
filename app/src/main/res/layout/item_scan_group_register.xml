@@ -5,8 +5,11 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="20dp"
     android:layout_marginTop="12dp"
+    app:cardBackgroundColor="@color/scan_card_background"
     app:cardCornerRadius="15dp"
-    app:cardElevation="1dp">
+    app:cardElevation="1dp"
+    app:strokeColor="@color/scan_card_stroke"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,14 +27,14 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:src="@android:drawable/ic_menu_edit"
-                app:tint="#8D8D8D" />
+                app:tint="@color/scan_icon_tint" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="효능군"
-                android:textColor="#555555"
+                android:textColor="@color/scan_label_text"
                 android:textSize="14sp" />
         </LinearLayout>
 
@@ -41,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="감기약"
-            android:textColor="#111111"
+            android:textColor="@color/scan_title_text"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -51,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:text="코미정, 슈다페드정"
-            android:textColor="#666666"
+            android:textColor="@color/scan_body_text"
             android:textSize="14sp" />
 
         <LinearLayout
@@ -65,14 +68,14 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:src="@android:drawable/ic_menu_my_calendar"
-                app:tint="#8D8D8D" />
+                app:tint="@color/scan_icon_tint" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="복용 기간"
-                android:textColor="#555555"
+                android:textColor="@color/scan_label_text"
                 android:textSize="14sp" />
         </LinearLayout>
 
@@ -90,7 +93,7 @@
                 android:background="@drawable/bg_date_field"
                 android:padding="12dp"
                 android:text="2026-05-01"
-                android:textColor="#111111" />
+                android:textColor="@color/scan_title_text" />
 
             <Space
                 android:layout_width="12dp"
@@ -104,7 +107,7 @@
                 android:background="@drawable/bg_date_field"
                 android:padding="12dp"
                 android:text="2026-05-05"
-                android:textColor="#111111" />
+                android:textColor="@color/scan_title_text" />
         </LinearLayout>
 
     <LinearLayout
@@ -118,14 +121,14 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:src="@android:drawable/ic_lock_idle_alarm"
-            app:tint="#8D8D8D" />
+            app:tint="@color/scan_icon_tint" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="시간"
-            android:textColor="#555555"
+            android:textColor="@color/scan_label_text"
             android:textSize="14sp" />
     </LinearLayout>
 
@@ -170,11 +173,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="#FDE7E6"
+            android:backgroundTint="@color/scan_badge_background"
             android:paddingHorizontal="10dp"
             android:paddingVertical="6dp"
             android:text="취침 전 계열"
-            android:textColor="#FF786E"
+            android:textColor="@color/scan_badge_text"
             android:textSize="12sp"
             android:visibility="gone" />
     </LinearLayout>

@@ -1,5 +1,6 @@
 package com.app.smh.calendar;
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridView;
@@ -10,10 +11,10 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 
+import com.app.smh.BaseActivity;
 import com.app.smh.R;
 import com.app.smh.scan.DrugInfoApiManager;
 import com.app.smh.scan.DrugResultItem;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class MedicationCalendarActivity extends     AppCompatActivity {
+public class MedicationCalendarActivity extends BaseActivity {
 
     private ImageButton btnBack;
     private ImageButton btnPrevMonth;
@@ -68,6 +69,7 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
             renderCalendar();
         });
         tvMonthTitle.setOnClickListener(v -> showMonthYearPickerDialog());
+        applyNavigationIconTints();
 
         renderCalendar();
         renderSelectedDateDetails();
@@ -83,6 +85,19 @@ public class MedicationCalendarActivity extends     AppCompatActivity {
         tvSelectedDateTitle = findViewById(R.id.tv_selected_date_title);
         gridCalendar = findViewById(R.id.grid_calendar);
         layoutDetailList = findViewById(R.id.layout_detail_list);
+    }
+
+    private void applyNavigationIconTints() {
+        int iconColor = ContextCompat.getColor(this, R.color.main_icon_tint);
+        if (btnBack != null) {
+            btnBack.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+        }
+        if (btnPrevMonth != null) {
+            btnPrevMonth.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+        }
+        if (btnNextMonth != null) {
+            btnNextMonth.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+        }
     }
 
     private void renderCalendar() {

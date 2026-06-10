@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@android:color/white"
+    android:background="@drawable/bg_scan_result_card"
     android:layout_marginTop="8dp"
     android:padding="12dp">
 
@@ -19,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="약 이름"
-            android:textColor="#111111"
+            android:textColor="@color/scan_title_text"
             android:textSize="17sp"
             android:textStyle="bold" />
 
@@ -36,7 +37,8 @@
             android:layout_height="32dp"
             android:background="@android:color/transparent"
             android:contentDescription="상세 펼치기"
-            android:src="@drawable/ic_arrow_right" />
+            android:src="@drawable/ic_arrow_right"
+            app:tint="@color/scan_icon_tint" />
     </LinearLayout>
 
     <LinearLayout
@@ -51,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="품목명"
-            android:textColor="#FF7F73"
+            android:textColor="@color/main_coral"
             android:textStyle="bold" />
 
         <TextView
@@ -59,7 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#222222"
+            android:textColor="@color/scan_title_text"
             android:textSize="15sp" />
 
         <TextView
@@ -67,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="제조사"
-            android:textColor="#FF7F73"
+            android:textColor="@color/main_coral"
             android:textStyle="bold" />
 
         <TextView
@@ -75,7 +77,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#222222"
+            android:textColor="@color/scan_title_text"
             android:textSize="15sp" />
 
         <TextView
@@ -83,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="효능/효과"
-            android:textColor="#FF7F73"
+            android:textColor="@color/main_coral"
             android:textStyle="bold" />
 
         <TextView
@@ -91,7 +93,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#222222"
+            android:textColor="@color/scan_title_text"
             android:textSize="14sp" />
 
         <TextView
@@ -99,7 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="용법/용량"
-            android:textColor="#FF7F73"
+            android:textColor="@color/main_coral"
             android:textStyle="bold" />
 
         <TextView
@@ -107,7 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#222222"
+            android:textColor="@color/scan_title_text"
             android:textSize="14sp" />
 
         <TextView
@@ -115,7 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="주의사항"
-            android:textColor="#FF7F73"
+            android:textColor="@color/main_coral"
             android:textStyle="bold" />
 
         <TextView
@@ -123,15 +125,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#222222"
+            android:textColor="@color/scan_title_text"
             android:textSize="14sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="보관방법"
-            android:textColor="#FF7F73"
+            android:text="보관 방법"
+            android:textColor="@color/main_coral"
             android:textStyle="bold" />
 
         <TextView
@@ -139,7 +141,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#222222"
+            android:textColor="@color/scan_title_text"
             android:textSize="14sp" />
 
     </LinearLayout>

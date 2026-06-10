@@ -14,7 +14,7 @@ import com.app.smh.schedule.MedicationServerSync;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 
-public class AlarmSettingsActivity extends AppCompatActivity {
+public class AlarmSettingsActivity extends BaseActivity {
 
     private ImageButton btnBack;
 

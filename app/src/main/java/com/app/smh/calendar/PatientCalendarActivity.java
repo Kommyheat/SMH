@@ -7,9 +7,9 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.app.smh.BaseActivity;
 import com.app.smh.R;
 import com.app.smh.SettingsManager;
 import com.app.smh.auth.AuthApiClient;
@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class PatientCalendarActivity extends AppCompatActivity {
+public class PatientCalendarActivity extends BaseActivity {
 
     private ImageButton btnBack;
     private ImageButton btnPrevMonth;

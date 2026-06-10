@@ -82,7 +82,9 @@
                 android:layout_marginBottom="20dp"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                app:cardElevation="0dp"
+                app:strokeColor="@color/input_card_stroke"
+                app:strokeWidth="1dp">
 
 
                 <EditText
@@ -90,7 +92,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
-                    android:hint="제목을 입력해 주세요.(20자이내)"
+                    android:hint="제목을 입력해 주세요. (20자 이내)"
                     android:textColorHint="#AAAAAA"
                     android:textColor="@color/black"
                     android:textSize="14sp"
@@ -116,7 +118,9 @@
                 android:layout_marginBottom="20dp"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                app:cardElevation="0dp"
+                app:strokeColor="@color/input_card_stroke"
+                app:strokeWidth="1dp">
 
                 <EditText
                     android:id="@+id/et_inquiry_content"

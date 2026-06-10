@@ -15,7 +15,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class InquiryActivity extends AppCompatActivity {
+public class InquiryActivity extends BaseActivity {
 
     private EditText etInquiryTitle;
     private EditText etInquiryContent;

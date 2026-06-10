@@ -1,7 +1,9 @@
 package com.app.smh;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -11,21 +13,19 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.LinearLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.app.smh.api.ChatbotApiClient;
 
-public class ChatbotActivity extends AppCompatActivity {
+public class ChatbotActivity extends BaseActivity {
+
+    private static final int CHAT_VERTICAL_SPACING_DP = 14;
 
     private ImageButton btnBackChatbot;
     private ImageButton btnSendChat;
     private EditText etChatInput;
 
     private Button btnQTime, btnQSideEffect, btnQInteraction, btnQScanInfo, btnQGuardian;
-    private BottomNavigationView bottomNavigationView;
 
     private final ChatbotApiClient chatbotApiClient = new ChatbotApiClient();
 
@@ -51,13 +51,11 @@ public class ChatbotActivity extends AppCompatActivity {
         btnQScanInfo = findViewById(R.id.btn_q_scan_info);
         btnQGuardian = findViewById(R.id.btn_q_guardian);
 
-        bottomNavigationView = findViewById(R.id.bottom_nav_chat);
 
+        applyNavigationIconTint();
         btnBackChatbot.setOnClickListener(v -> finish());
 
 
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
-        bottomNavigationView.setOnItemSelectedListener(item -> true);
 
         btnQTime.setOnClickListener(v -> askChatbot("복용 시간 방법"));
         btnQSideEffect.setOnClickListener(v -> askChatbot("부작용"));
@@ -85,6 +83,14 @@ public class ChatbotActivity extends AppCompatActivity {
         askChatbot(question);
     }
 
+    private void applyNavigationIconTint() {
+        if (btnBackChatbot == null) return;
+        btnBackChatbot.setColorFilter(
+                ContextCompat.getColor(this, R.color.main_icon_tint),
+                PorterDuff.Mode.SRC_IN
+        );
+    }
+
     private void hideKeyboard() {
         View view = getCurrentFocus();
         if (view != null) {
@@ -104,7 +110,7 @@ public class ChatbotActivity extends AppCompatActivity {
 
         addUserMessage(question);
 
-        TextView loadingMessage = addBotMessage("답변을 준비하고 있어요...");
+        TextView loadingMessage = addBotMessage("답변을 대기중입니다...");
 
         new Thread(() -> {
             try {
@@ -149,6 +155,12 @@ public class ChatbotActivity extends AppCompatActivity {
         tv.setPadding(30, 20, 30, 20);
         tv.setTextColor(ContextCompat.getColor(this, R.color.black));
         tv.setTextSize(15);
+        tv.setMaxWidth(getBubbleMaxWidth());
+        tv.setSingleLine(false);
+        tv.setHorizontallyScrolling(false);
+        tv.setLineSpacing(0f, 1.15f);
+        tv.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL);
+        tv.setBreakStrategy(Layout.BREAK_STRATEGY_HIGH_QUALITY);
         tv.setBackgroundResource(R.drawable.bg_quick_question_selected);
 
         LinearLayout.LayoutParams params =
@@ -157,7 +169,7 @@ public class ChatbotActivity extends AppCompatActivity {
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
 
-        params.setMargins(100, 20, 0, 0);
+        params.setMargins(100, dpToPx(CHAT_VERTICAL_SPACING_DP), 0, 0);
         params.gravity = android.view.Gravity.END;
 
         tv.setLayoutParams(params);
@@ -171,8 +183,14 @@ public class ChatbotActivity extends AppCompatActivity {
 
         tv.setText(message);
         tv.setPadding(30, 20, 30, 20);
-        tv.setTextColor(ContextCompat.getColor(this, R.color.black));
+        tv.setTextColor(ContextCompat.getColor(this, R.color.chatbot_bot_bubble_text));
         tv.setTextSize(15);
+        tv.setMaxWidth(getBubbleMaxWidth());
+        tv.setSingleLine(false);
+        tv.setHorizontallyScrolling(false);
+        tv.setLineSpacing(0f, 1.15f);
+        tv.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL);
+        tv.setBreakStrategy(Layout.BREAK_STRATEGY_HIGH_QUALITY);
         tv.setBackgroundResource(R.drawable.bg_chat_bubble_left);
 
         LinearLayout.LayoutParams params =
@@ -181,7 +199,7 @@ public class ChatbotActivity extends AppCompatActivity {
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
 
-        params.setMargins(0, 20, 100, 0);
+        params.setMargins(0, dpToPx(CHAT_VERTICAL_SPACING_DP), 100, 0);
 
         tv.setLayoutParams(params);
         chatContainer.addView(tv);
@@ -189,6 +207,15 @@ public class ChatbotActivity extends AppCompatActivity {
         scrollToBottom();
 
         return tv;
+    }
+
+    private int getBubbleMaxWidth() {
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        return screenWidth - dpToPx(136);
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 
     private void scrollToBottom() {

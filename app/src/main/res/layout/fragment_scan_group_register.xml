@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
-    android:background="#F7F7F7"
+    android:background="@color/scan_screen_background"
     android:orientation="vertical">
 
     <TextView
@@ -13,7 +13,7 @@
         android:layout_marginTop="24dp"
         android:gravity="center"
         android:text="스캔 결과"
-        android:textColor="#111111"
+        android:textColor="@color/scan_title_text"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -23,7 +23,7 @@
         android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="복용 정보를 등록해주세요"
-        android:textColor="#666666"
+        android:textColor="@color/scan_body_text"
         android:textSize="15sp" />
 
     <androidx.recyclerview.widget.RecyclerView

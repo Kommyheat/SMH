@@ -23,8 +23,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="0dp">
+        app:layout_constraintTop_toTopOf="parent">
 
 
 
@@ -76,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:text="약드림"
-                android:textColor="@color/black"
+                android:textColor="@color/splash_title_color"
                 android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -513,13 +512,15 @@
 
                     <ImageButton
                         android:id="@+id/btn_add_medicine"
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:layout_marginVertical="10dp"
                         android:layout_gravity="center_horizontal"
-                        android:background="@drawable/bg_add_button"
-                        android:src="@android:drawable/ic_input_add"
+                        android:background="@drawable/bg_add_medicine_button"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_add_medicine"
                         android:contentDescription="복약 추가"
-                        app:tint="@color/dark_gray" />
+                        android:scaleType="centerInside" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

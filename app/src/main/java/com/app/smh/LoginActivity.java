@@ -54,7 +54,7 @@ import com.navercorp.nid.oauth.util.NidOAuthCallback;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
 
     private ImageButton btnCloseLogin;
     private EditText etLoginId;

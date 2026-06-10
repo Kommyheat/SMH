@@ -15,4 +15,52 @@
 
     <color name="nav_unselected">#FFD0D0D0</color>
 
+    <color name="chatbot_bot_bubble_fill">#4B5563</color>
+
+    <color name="chatbot_bot_bubble_stroke">#667281</color>
+
+    <color name="chatbot_bot_bubble_text">#F8FAFC</color>
+
+    <color name="chatbot_user_bubble_fill">#E78D82</color>
+
+    <color name="chatbot_user_bubble_stroke">#E78D82</color>
+
+    <color name="chatbot_input_fill">#4A4F57</color>
+
+    <color name="chatbot_input_stroke">#69727D</color>
+
+    <color name="chatbot_suggestion_fill">#4B4B4B</color>
+
+    <color name="chatbot_suggestion_stroke">#616161</color>
+
+    <color name="chatbot_quick_question_fill">#5A5A5A</color>
+
+    <color name="chatbot_quick_question_stroke">#777777</color>
+
+    <color name="logo_dark_overlay">#52FFFFFF</color>
+
+    <color name="splash_title_color">#677E9C</color>
+
+    <color name="main_icon_tint">#FFFFFFFF</color>
+
+    <color name="input_card_stroke">#69727D</color>
+
+    <color name="scan_screen_background">#FF2F343B</color>
+
+    <color name="scan_card_background">#FF414750</color>
+
+    <color name="scan_card_stroke">#FF69727D</color>
+
+    <color name="scan_title_text">#FFF8FAFC</color>
+
+    <color name="scan_body_text">#FFD3DAE3</color>
+
+    <color name="scan_label_text">#FFC8D0DA</color>
+
+    <color name="scan_icon_tint">#FFB7C1CC</color>
+
+    <color name="scan_badge_background">#665B6470</color>
+
+    <color name="scan_badge_text">#FFFFB4AC</color>
+
 </resources>

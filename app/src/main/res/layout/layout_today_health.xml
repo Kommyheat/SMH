@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:paddingStart="135dp"
+                android:gravity="center"
                 android:text="# 알림"
                 android:textColor="@color/black"
                 android:textSize="18sp"
@@ -74,14 +74,14 @@
     <!-- X 닫기 버튼: 카드 바깥 하단 중앙에 겹쳐 배치 -->
     <ImageButton
         android:id="@+id/btn_close_health"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/bg_alarm_item"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:background="@drawable/bg_health_close_button"
+        android:padding="10dp"
+        android:src="@drawable/ic_close_health"
         android:contentDescription="닫기"
-        android:elevation="10dp"
-        app:tint="@color/black" />
+         />
 
 </RelativeLayout>

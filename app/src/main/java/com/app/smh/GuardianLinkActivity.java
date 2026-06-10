@@ -22,7 +22,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
 
-public class GuardianLinkActivity extends AppCompatActivity {
+public class GuardianLinkActivity extends BaseActivity {
 
     private ImageButton btnBack;
     private TextView tvMyUserCode;
