@@ -26,7 +26,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.IOException;
 
-public class FindIdActivity extends AppCompatActivity {
+public class FindIdActivity extends BaseActivity {
 
     private AuthApiClient authApiClient;
     private CountDownTimer codeTimer;

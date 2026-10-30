@@ -181,6 +181,8 @@ public class ScanGroupRegisterFragment extends Fragment {
                 scheduleItem.setCompleted(false);
                 scheduleItem.setDrugDetails(details);
                 scheduleItems.add(scheduleItem);
+                scheduleItem.setQuantity(item.getQuantity());
+                scheduleItem.setUnit(item.getUnit());
             }
         }
 
@@ -205,18 +207,22 @@ public class ScanGroupRegisterFragment extends Fragment {
         DrugDetailCache cache = DrugDetailCache.getInstance();
 
         for (String drugName : item.getDrugNames()) {
+            // 상세정보 없어도 약품명은 무조건 저장
+            ScheduleMedicineItem.DrugDetail detail = new ScheduleMedicineItem.DrugDetail();
+            detail.recognizedName = drugName;
+
             DrugResultItem cached = cache.get(drugName);
             if (cached != null && cached.hasDetail()) {
-                ScheduleMedicineItem.DrugDetail detail = new ScheduleMedicineItem.DrugDetail();
-                detail.recognizedName = drugName;
+                // 상세정보 있으면 채움
                 detail.itemName = cached.getItemName();
                 detail.entpName = cached.getEntpName();
                 detail.efcyQesitm = cached.getEfcyQesitm();
                 detail.useMethodQesitm = cached.getUseMethodQesitm();
                 detail.atpnWarnQesitm = cached.getAtpnWarnQesitm();
                 detail.depositMethodQesitm = cached.getDepositMethodQesitm();
-                details.add(detail);
             }
+            // 상세정보 없어도 무조건 추가 (약품명만이라도 저장)
+            details.add(detail);
         }
         return details;
     }
@@ -233,7 +239,8 @@ public class ScanGroupRegisterFragment extends Fragment {
         }
 
         btnRegisterAll.setEnabled(allValid);
-        btnRegisterAll.setAlpha(allValid ? 1f : 0.4f);
+        btnRegisterAll.setAlpha(1f);
+        btnRegisterAll.setText(allValid ? "등록하기" : "날짜와 시간을 모두 선택해주세요");
     }
 
     @Override

@@ -62,4 +62,15 @@ public class CareLinkController {
     public MessageResponse rejectLink(@RequestBody CareLinkDecisionRequest request) {
         return careLinkService.rejectCareLink(request);
     }
+
+    // userId 기준 전체 연동 목록 조회
+    @GetMapping("/list")
+    public List<CareLinkStatusResponse> getCareLinkList(@RequestParam Long userId) {
+        return careLinkService.getCareLinkList(userId);
+    }
+
+
+
+
+
 }

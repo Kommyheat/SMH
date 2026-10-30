@@ -25,7 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.IOException;
 
-public class FindPasswordActivity extends AppCompatActivity {
+public class FindPasswordActivity extends BaseActivity {
 
     private AuthApiClient authApiClient;
     private CountDownTimer codeTimer;

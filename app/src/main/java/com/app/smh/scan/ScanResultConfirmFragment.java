@@ -127,7 +127,12 @@ public class ScanResultConfirmFragment extends Fragment {
                 1
         );
         divider.setLayoutParams(params);
-        divider.setBackgroundColor(0xFFD9D9D9);
+        divider.setBackgroundColor(
+                androidx.core.content.ContextCompat.getColor(
+                        requireContext(),
+                        R.color.scan_card_stroke
+                )
+        );
         layoutDrugList.addView(divider);
     }
 

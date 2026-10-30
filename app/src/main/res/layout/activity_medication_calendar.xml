@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="#F6F6F6">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:background="@color/white"
+            android:background="@color/light_gray"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
             android:paddingStart="6dp"
@@ -208,7 +208,7 @@
                     android:layout_width="7dp"
                     android:layout_height="7dp"
                     android:layout_gravity="center_vertical"
-                    android:background="@drawable/bg_legend_done_dot" />
+                    android:background="@drawable/bg_dot_green" />
 
                 <TextView
                     android:id="@+id/tv_legend_done"
@@ -223,7 +223,7 @@
                     android:layout_height="7dp"
                     android:layout_marginStart="10dp"
                     android:layout_gravity="center_vertical"
-                    android:background="@drawable/bg_legend_progress_dot" />
+                    android:background="@drawable/bg_calendar_today" />
 
                 <TextView
                     android:id="@+id/tv_legend_progress"
@@ -231,6 +231,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:text="0 진행중"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/bg_dot_red" /> <!-- 아까 만든 빨간 점 -->
+
+                <TextView
+                    android:id="@+id/tv_legend_missed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="0 미복용"
                     android:textSize="10sp" />
             </LinearLayout>
         </LinearLayout>

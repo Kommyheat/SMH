@@ -1,13 +1,10 @@
 package com.app.smh;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-public class FontSizeActivity extends AppCompatActivity {
+public class FontSizeActivity extends BaseActivity {
 
     private static final float[] FONT_SCALES = {0.85f, 1.0f, 1.15f, 1.3f, 1.5f};
 
@@ -55,7 +52,7 @@ public class FontSizeActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 float scale = FONT_SCALES[seekBar.getProgress()];
                 SettingsManager.setFontScale(FontSizeActivity.this, scale);
-                applyFontScale(scale);
+                SmhApplication.refreshUi(FontSizeActivity.this);
             }
         });
     }
@@ -63,12 +60,6 @@ public class FontSizeActivity extends AppCompatActivity {
     private void applyPreview(float scale) {
         if (tvPreview != null) tvPreview.setTextSize(16f * scale);
         if (tvPreviewStatus != null) tvPreviewStatus.setTextSize(14f * scale);
-    }
-
-    private void applyFontScale(float scale) {
-        Configuration config = new Configuration(getResources().getConfiguration());
-        config.fontScale = scale;
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
     }
 
     private int scaleToProgress(float scale) {

@@ -21,7 +21,7 @@ import com.app.smh.auth.AuthApiClient;
 
 import java.io.IOException;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends BaseActivity {
 
     private View btnCloseLogin;
 

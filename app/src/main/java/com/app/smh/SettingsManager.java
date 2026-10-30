@@ -2,6 +2,7 @@ package com.app.smh;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 
 public class SettingsManager {
 
@@ -252,6 +253,7 @@ public class SettingsManager {
 
     // 글자 크기 설정 (1.0f = 기본, 1.3f = 큰 글씨)
     private static final String KEY_FONT_SCALE = "key_font_scale";
+    private static final String KEY_PRE_SENIOR_FONT_SCALE = "key_pre_senior_font_scale";
 
     public static float getFontScale(Context context) {
         return getPrefs(context).getFloat(KEY_FONT_SCALE, 1.0f);
@@ -259,6 +261,24 @@ public class SettingsManager {
 
     public static void setFontScale(Context context, float scale) {
         getPrefs(context).edit().putFloat(KEY_FONT_SCALE, scale).apply();
+    }
+
+    public static void setPreSeniorFontScale(Context context, float scale) {
+        getPrefs(context).edit().putFloat(KEY_PRE_SENIOR_FONT_SCALE, scale).apply();
+    }
+
+    public static float getPreSeniorFontScale(Context context) {
+        return getPrefs(context).getFloat(KEY_PRE_SENIOR_FONT_SCALE, 1.0f);
+    }
+
+    public static Context wrapContextWithFontScale(Context context) {
+        float scale = getFontScale(context);
+        Configuration configuration = new Configuration(context.getResources().getConfiguration());
+        if (Math.abs(configuration.fontScale - scale) < 0.001f) {
+            return context;
+        }
+        configuration.fontScale = scale;
+        return context.createConfigurationContext(configuration);
     }
 
     // 프로필 이미지 경로 저장

@@ -26,12 +26,29 @@ public class ScheduleMedicineItem {
 
     private String memo;
 
+    private double quantity = 1.0;
+    private String unit = "정";
+
+    // getter/setter 추가
+    public double getQuantity() { return quantity; }
+    public void setQuantity(double quantity) { this.quantity = quantity; }
+
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+
+    public String getQuantityText() {
+        if (quantity == (int) quantity) {
+            return (int) quantity + (unit != null ? unit : "정");
+        }
+        return quantity + (unit != null ? unit : "정");
+    }
     public String getMemo() {
         return memo != null ? memo : "";
     }
     public void setMemo(String memo) {
         this.memo = memo;
     }
+
 
     public ScheduleMedicineItem() {
         this.scheduleId = null;

@@ -154,25 +154,40 @@ public class PatientCalendarActivity extends AppCompatActivity {
         int firstDayOfWeek = monthCal.get(Calendar.DAY_OF_WEEK) - 1;
         int lastDay = monthCal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
+        // 1. 달력 시작 전 빈 칸 채우기 (8개 파라미터로 수정)
         for (int i = 0; i < firstDayOfWeek; i++) {
-            items.add(new CalendarDayItem("", 0, false, false, false, false));
+            items.add(new CalendarDayItem("", 0, false, false, false, false, false, false));
         }
 
+        // 2. 실제 날짜 채우기
         for (int day = 1; day <= lastDay; day++) {
             Calendar dayCal = (Calendar) monthCal.clone();
             dayCal.set(Calendar.DAY_OF_MONTH, day);
 
             String dateString = formatDate(dayCal);
             boolean isToday = isSameDate(dayCal, Calendar.getInstance());
-            boolean isDone = isDateAllCompleted(dateString);
             boolean isSelected = isSameDate(dayCal, selectedDateCalendar);
+            boolean isFuture = dayCal.after(Calendar.getInstance());
 
-            items.add(new CalendarDayItem(
-                    dateString, day, true, isToday, isDone, isSelected));
+            // 서버 데이터(intakeLogMap)를 기반으로 상태 계산
+            List<AuthApiClient.IntakeLogResponse> dayLogs = intakeLogMap.get(dateString);
+
+            // 해당 날짜에 약 처방(스케줄) 데이터가 있는지 확인
+            boolean isInPeriod = (dayLogs != null && !dayLogs.isEmpty());
+
+            // 해당 날짜의 모든 약을 먹었는지 확인
+            boolean isDone = isDateAllCompleted(dateString);
+
+            // 미복용 누락 확인 (과거 + 처방있음 + 아직 다 안먹음)
+            boolean isMissed = !isFuture && !isToday && isInPeriod && !isDone;
+
+            // 수정된 생성자 호출
+            items.add(new CalendarDayItem(dateString, day, true, isToday, isDone, isMissed, isInPeriod, isSelected));
         }
 
+        // 3. 달력 끝난 후 빈 칸 채우기 (8개 파라미터로 수정)
         while (items.size() % 7 != 0) {
-            items.add(new CalendarDayItem("", 0, false, false, false, false));
+            items.add(new CalendarDayItem("", 0, false, false, false, false, false, false));
         }
 
         return items;

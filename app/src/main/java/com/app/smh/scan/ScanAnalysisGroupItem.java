@@ -12,6 +12,8 @@ public class ScanAnalysisGroupItem {
     // 단일 → 다중 시간대
     private ArrayList<String> intakeTimes;
     private boolean bedtimeGroup;
+    private double quantity = 1.0;
+    private String unit = "정";
 
     public ScanAnalysisGroupItem() {
         drugNames = new ArrayList<>();
@@ -34,7 +36,7 @@ public class ScanAnalysisGroupItem {
         return intakeTimes != null ? intakeTimes : new ArrayList<>();
     }
     public void setIntakeTimes(ArrayList<String> intakeTimes) {
-        this.intakeTimes = intakeTimes;
+        this.intakeTimes = (intakeTimes != null) ? intakeTimes : new ArrayList<>();
     }
 
     // 첫 번째 시간대 반환
@@ -54,6 +56,21 @@ public class ScanAnalysisGroupItem {
 
     public boolean isBedtimeGroup() { return bedtimeGroup; }
     public void setBedtimeGroup(boolean bedtimeGroup) { this.bedtimeGroup = bedtimeGroup; }
+
+    // quantity getter/setter
+    public double getQuantity() { return quantity; }
+    public void setQuantity(double quantity) { this.quantity = quantity; }
+
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+
+    // 횟수 텍스트 (예: "2정", "1.5정")
+    public String getQuantityText() {
+        if (quantity == (int) quantity) {
+            return (int) quantity + unit;
+        }
+        return quantity + unit;
+    }
 
     // intakeTimes 기준으로 유효성 검사
     public boolean isValid() {

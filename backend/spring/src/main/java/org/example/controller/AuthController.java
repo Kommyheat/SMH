@@ -8,11 +8,15 @@ import org.example.dto.EmailCodeVerifyResponse;
 import org.example.dto.FindLoginIdByCodeRequest;
 import org.example.dto.FindLoginIdRequest;
 import org.example.dto.FindLoginIdResponse;
+import org.example.dto.GoogleLoginRequest;
+import org.example.dto.KakaoLoginRequest;
 import org.example.dto.LoginResponse;
 import org.example.dto.MessageResponse;
+import org.example.dto.NaverLoginRequest;
 import org.example.dto.ResetPasswordByCodeRequest;
 import org.example.dto.ResetPasswordRequest;
 import org.example.dto.ResetPasswordResponse;
+import org.example.dto.SocialProfileCompleteRequest;
 import org.example.dto.UserCreateRequest;
 import org.example.dto.UserLoginRequest;
 import org.example.dto.UserProfileResponse;
@@ -38,6 +42,26 @@ public class AuthController {
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody UserLoginRequest request) {
         return userService.login(request);
+    }
+
+    @PostMapping("/social/google")
+    public LoginResponse socialGoogleLogin(@Valid @RequestBody GoogleLoginRequest request) {
+        return userService.loginWithGoogle(request.getIdToken());
+    }
+
+    @PostMapping("/social/kakao")
+    public LoginResponse socialKakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
+        return userService.loginWithKakao(request.getAccessToken());
+    }
+
+    @PostMapping("/social/naver")
+    public LoginResponse socialNaverLogin(@Valid @RequestBody NaverLoginRequest request) {
+        return userService.loginWithNaver(request.getAccessToken());
+    }
+
+    @RequestMapping(value = "/social/complete-profile", method = {RequestMethod.POST, RequestMethod.PATCH})
+    public LoginResponse completeSocialProfile(@Valid @RequestBody SocialProfileCompleteRequest request) {
+        return userService.completeSocialProfile(request.getUserId(), request.getName(), request.getBirthDate());
     }
 
     @GetMapping("/check-login-id")

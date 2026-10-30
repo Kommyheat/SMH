@@ -3,6 +3,8 @@ package com.app.smh;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,7 +41,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private AppCompatImageButton fabChatbot;
     private BottomNavigationView bottomNavigationView;
@@ -69,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView btnSelectAll;
     private TextView btnDeleteSelected;
     private TextView btnCancelSelection;
+
+    private LinearLayout layoutPendingBanner;
+    private TextView tvPendingBanner;
 
     private String makeItemKey(ScheduleMedicineItem item) {
         return item.getCategoryName() + "_"
@@ -103,6 +108,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         initViews();
+        applyDarkModeLogoOverlay();
+        applyMainIconTints();
+        TextView logoTitle = findViewById(R.id.tv_logo_title);
+        if (logoTitle != null) {
+            logoTitle.setVisibility(View.VISIBLE);
+        }
+
         setupBottomNavigation();
         setupFabChatbot();
         setupCalendarButton();
@@ -117,8 +129,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        restoreCurrentTabState();
         applyHomeBannerMessage();
         renderScheduleForSelectedDate();
+        checkPendingCareLink();
     }
 
     @Override
@@ -152,6 +166,41 @@ public class MainActivity extends AppCompatActivity {
         btnSelectAll = findViewById(R.id.btn_select_all);
         btnDeleteSelected = findViewById(R.id.btn_delete_selected);
         btnCancelSelection = findViewById(R.id.btn_cancel_selection);
+        layoutPendingBanner = findViewById(R.id.layout_pending_banner);
+        tvPendingBanner = findViewById(R.id.tv_pending_banner);
+    }
+
+    private void applyDarkModeLogoOverlay() {
+        ImageView logoView = findViewById(R.id.iv_logo);
+        if (logoView == null) return;
+
+        int nightMode = getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK;
+        if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
+            logoView.setColorFilter(
+                    ContextCompat.getColor(this, R.color.logo_dark_overlay),
+                    PorterDuff.Mode.SRC_ATOP
+            );
+        } else {
+            logoView.clearColorFilter();
+        }
+    }
+
+    private void applyMainIconTints() {
+        int iconColor = ContextCompat.getColor(this, R.color.main_icon_tint);
+        if (btnCalendar != null) {
+            btnCalendar.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+        }
+        if (btnPrevDate != null) {
+            btnPrevDate.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+        }
+        if (btnNextDate != null) {
+            btnNextDate.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+        }
+        ImageView favoriteIcon = findViewById(R.id.iv_favorite);
+        if (favoriteIcon != null && !isHealthPanelVisible) {
+            favoriteIcon.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+        }
     }
 
     // 선택 모드 툴바 (다이얼로그 1번만)
@@ -267,9 +316,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showHomeContent() {
-        if (mainScroll != null) mainScroll.setVisibility(View.VISIBLE);
-        if (fragmentContainer != null) fragmentContainer.setVisibility(View.GONE);
-        if (fabChatbot != null) fabChatbot.setVisibility(View.VISIBLE);
+        androidx.fragment.app.Fragment currentFragment =
+                getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (currentFragment != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(currentFragment)
+                    .commitNowAllowingStateLoss();
+        }
+
+        View topAppBar = findViewById(R.id.top_app_bar);
+
+        if (topAppBar != null) {
+            topAppBar.setVisibility(View.VISIBLE);
+        }
+
+        if (mainScroll != null) {
+            mainScroll.setVisibility(View.VISIBLE);
+        }
+
+        if (fragmentContainer != null) {
+            fragmentContainer.setVisibility(View.GONE);
+        }
+
+        if (fabChatbot != null) {
+            fabChatbot.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showScanFragment() {
@@ -330,7 +402,10 @@ public class MainActivity extends AppCompatActivity {
     private void hideHealthPanel(ImageView heartIcon) {
         if (heartIcon != null) {
             heartIcon.setImageResource(R.drawable.ic_heart);
-            heartIcon.clearColorFilter();
+            heartIcon.setColorFilter(
+                    ContextCompat.getColor(this, R.color.main_icon_tint),
+                    PorterDuff.Mode.SRC_IN
+            );
         }
         if (dimOverlay != null) {
             dimOverlay.animate().alpha(0f).setDuration(200)
@@ -403,6 +478,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void restoreCurrentTabState() {
+        if (bottomNavigationView == null) return;
+        int selectedItemId = bottomNavigationView.getSelectedItemId();
+        if (selectedItemId == R.id.nav_scan) {
+            androidx.fragment.app.Fragment currentFragment =
+                    getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (currentFragment == null) {
+                showScanFragment();
+            } else {
+                if (mainScroll != null) mainScroll.setVisibility(View.GONE);
+                if (fragmentContainer != null) fragmentContainer.setVisibility(View.VISIBLE);
+                if (fabChatbot != null) fabChatbot.setVisibility(View.GONE);
+            }
+        } else {
+            showHomeContent();
+        }
+    }
+
     private void renderScheduleForSelectedDate() {
         String selectedDate = getSelectedDateString();
         if (tvSelectedDate != null) {
@@ -436,6 +529,13 @@ public class MainActivity extends AppCompatActivity {
         if (container == null || emptyView == null) return;
         container.removeAllViews();
         if (items == null || items.isEmpty()) {
+            View parent = (View) emptyView.getParent();
+            if (parent instanceof LinearLayout && parent != container) {
+                ((LinearLayout) parent).removeView(emptyView);
+            }
+            if (emptyView.getParent() == null) {
+                container.addView(emptyView);
+            }
             emptyView.setVisibility(View.VISIBLE);
             return;
         }
@@ -453,6 +553,20 @@ public class MainActivity extends AppCompatActivity {
             CheckBox checkbox = itemView.findViewById(R.id.checkbox_item);
 
             if (tvCategoryName != null) tvCategoryName.setText(item.getCategoryName());
+
+            //  복용 횟수 표시
+            TextView tvQuantity = itemView.findViewById(R.id.tv_quantity);
+            if (tvQuantity != null) {
+                String quantityText = item.getQuantityText();
+                // 1정이 아닐 때만 표시 (기본값은 숨김)
+                if (quantityText != null && !quantityText.isEmpty()
+                        && !quantityText.equals("1정")) {
+                    tvQuantity.setText(quantityText);
+                    tvQuantity.setVisibility(View.VISIBLE);
+                } else {
+                    tvQuantity.setVisibility(View.GONE);
+                }
+            }
 
             boolean doneToday = item.isCompletedOn(currentDate);
             updateTakeButtonStyle(foreground, tvCategoryName, btnTakeDone, doneToday);
@@ -588,5 +702,44 @@ public class MainActivity extends AppCompatActivity {
         return today.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)
                 && today.get(Calendar.MONTH) == calendar.get(Calendar.MONTH)
                 && today.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
+    private void checkPendingCareLink() {
+        long userId = SettingsManager.getLoginUserId(this);
+        if (userId <= 0) return;
+
+        new Thread(() -> {
+            try {
+                com.app.smh.auth.AuthApiClient apiClient =
+                        new com.app.smh.auth.AuthApiClient();
+                com.app.smh.auth.AuthApiClient.CareLinkStatusResponse status =
+                        apiClient.getCareLinkStatus(userId);
+
+                runOnUiThread(() -> {
+                    // PENDING 상태이고 내가 받은 요청일 때 배너 표시
+                    if (status != null
+                            && "PENDING".equals(status.status)
+                            && status.caregiverId != userId) {
+
+                        String name = status.caregiverName != null
+                                ? status.caregiverName : "누군가";
+
+                        tvPendingBanner.setText(
+                                "📨 " + name + "님이 연동을 요청했어요 → 확인하기");
+                        layoutPendingBanner.setVisibility(View.VISIBLE);
+
+                        // 클릭 시 GuardianLinkActivity 이동
+                        layoutPendingBanner.setOnClickListener(v ->
+                                startActivity(new Intent(this,
+                                        GuardianLinkActivity.class)));
+                    } else {
+                        layoutPendingBanner.setVisibility(View.GONE);
+                    }
+                });
+            } catch (Exception e) {
+                runOnUiThread(() ->
+                        layoutPendingBanner.setVisibility(View.GONE));
+            }
+        }).start();
     }
 }

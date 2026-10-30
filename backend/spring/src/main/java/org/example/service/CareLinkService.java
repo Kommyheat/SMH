@@ -196,4 +196,26 @@ public class CareLinkService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
+
+    // userId 기준 ACTIVE 연동 목록 전체 반환
+    public List<CareLinkStatusResponse> getCareLinkList(Long userId) {
+        User user = findUserById(userId);
+        List<CareLink> links = careLinkRepository.findByCaregiversOrPatient(user);
+
+        return links.stream()
+                .filter(link -> link.getStatus() == CareLinkStatus.ACTIVE)
+                .map(link -> CareLinkStatusResponse.builder()
+                        .id(link.getId())
+                        .status(link.getStatus().name())
+                        .caregiverId(link.getCaregiver().getId())
+                        .caregiverName(link.getCaregiver().getName())
+                        .patientId(link.getPatient().getId())
+                        .patientName(link.getPatient().getName())
+                        .linkedAt(link.getLinkedAt() != null
+                                ? link.getLinkedAt().format(FMT) : null)
+                        .disconnectedAt(link.getDisconnectedAt() != null
+                                ? link.getDisconnectedAt().format(FMT) : null)
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

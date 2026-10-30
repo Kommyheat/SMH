@@ -137,12 +137,22 @@ public class ScanGroupAdapter extends RecyclerView.Adapter<ScanGroupAdapter.Grou
 
         picker.addOnPositiveButtonClickListener(selection -> {
             if (selection == null) return;
-            Calendar selected = Calendar.getInstance();
-            selected.setTimeInMillis(selection);
+
+            Calendar utc = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
+            utc.setTimeInMillis(selection);
+
+            Calendar local = Calendar.getInstance();
+            local.set(
+                    utc.get(Calendar.YEAR),
+                    utc.get(Calendar.MONTH),
+                    utc.get(Calendar.DAY_OF_MONTH)
+            );
+
             String date = String.format(Locale.getDefault(), "%04d-%02d-%02d",
-                    selected.get(Calendar.YEAR),
-                    selected.get(Calendar.MONTH) + 1,
-                    selected.get(Calendar.DAY_OF_MONTH));
+                    local.get(Calendar.YEAR),
+                    local.get(Calendar.MONTH) + 1,
+                    local.get(Calendar.DAY_OF_MONTH));
+
             target.setText(date);
             dateSelectedListener.onSelected(date);
         });

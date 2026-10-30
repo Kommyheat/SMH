@@ -10,6 +10,9 @@ aws:
 openai:
   api-key: ${OPENAI_API_KEY}
   model: gpt-4.1-mini
+
+google:
+  web-client-id: ${GOOGLE_WEB_CLIENT_ID:}
 ---
 spring:
   config:

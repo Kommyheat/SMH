@@ -2,12 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:fitsSystemWindows="true"
-    tools:context=".GuardianLinkActivity">
+    android:fitsSystemWindows="true">
 
     <!-- 상단 앱바 -->
     <LinearLayout
@@ -69,7 +67,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- 내 코드 섹션 -->
+            <!-- 내 코드 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -93,11 +91,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:letterSpacing="0.1"
                     android:text="불러오는 중..."
                     android:textColor="@color/black"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.1" />
+                    android:textStyle="bold" />
 
                 <ImageButton
                     android:id="@+id/btn_copy_invite_code"
@@ -110,185 +108,83 @@
                     app:tint="@color/main_coral" />
             </LinearLayout>
 
-            <!-- 구분선 -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"
-                android:background="@color/light_gray" />
-
-            <!-- 복약 상태 공유 스위치 (ACTIVE일 때) -->
-            <LinearLayout
-                android:id="@+id/layout_share_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="복약 상태 공유"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="보호자가 복약 현황 달력을 볼 수 있어요"
-                        android:textColor="@color/dark_gray"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switch_share_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    app:thumbTint="@color/switch_thumb_color"
-                    app:trackTint="@color/switch_track_color" />
-            </LinearLayout>
-
-            <!-- 미복용 알림 전송 스위치 -->
-            <LinearLayout
-                android:id="@+id/layout_missed_alert"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="미복용 알림 전송"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="미완료 약이 있으면 보호자에게 알림을 보내요"
-                        android:textColor="@color/dark_gray"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switch_missed_alert"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:thumbTint="@color/switch_thumb_color"
-                    app:trackTint="@color/switch_track_color" />
-            </LinearLayout>
-
-            <!-- 구분선 -->
-            <View
-                android:id="@+id/divider_switch"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
-                android:background="@color/light_gray"
-                android:visibility="gone" />
-
-            <!-- 연결된 보호자/피보호자 섹션 -->
+            <!-- 연동 요청 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="8dp"
-                android:text="연동 상태"
+                android:text="연동 요청"
                 android:textColor="@color/dark_gray"
                 android:textSize="13sp" />
 
-            <!-- 보호 중인 사용자 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_alarm_item_new"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tv_protected_user_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="보호 중인 사용자 없음"
+                <EditText
+                    android:id="@+id/et_invite_code"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/bg_alarm_item_new"
+                    android:hint="사용자 코드 입력"
+                    android:inputType="textCapCharacters"
+                    android:maxLength="12"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
                     android:textColor="@color/black"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:textColorHint="#A0A0A0" />
 
-                <TextView
-                    android:id="@+id/tv_protected_user_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="아직 보낸 요청이 없어요"
-                    android:textColor="@color/dark_gray"
-                    android:textSize="12sp" />
+                <LinearLayout
+                    android:id="@+id/btn_request_link"
+                    android:layout_width="80dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_guardian_status"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="연결"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="8dp"
+            <!-- 수락 대기 중 섹션 -->
+            <TextView
+                android:id="@+id/tv_pending_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="8dp"
-                android:background="@color/light_gray" />
+                android:text="수락 대기"
+                android:textColor="@color/dark_gray"
+                android:textSize="13sp"
+                android:visibility="gone" />
 
-            <!-- 내 보호자 -->
+            <!-- 수락 대기 목록 (동적 추가) -->
             <LinearLayout
+                android:id="@+id/layout_pending_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_alarm_item_new"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:visibility="gone" />
 
-                <TextView
-                    android:id="@+id/tv_my_guardian_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="연동된 보호자 없음"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tv_my_guardian_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="아직 연결되지 않았어요"
-                    android:textColor="@color/dark_gray"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- 수락/거절 버튼 -->
+            <!-- 수락/거절 버튼 (PENDING + 내가 patient일 때) -->
             <LinearLayout
                 android:id="@+id/layout_accept_reject"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:orientation="horizontal"
                 android:visibility="gone">
 
@@ -335,115 +231,131 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- 연동 요청 입력 -->
+            <!-- 연동된 사람 목록 섹션 -->
             <TextView
+                android:id="@+id/tv_connected_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="8dp"
-                android:text="보호자 연동 요청"
+                android:text="연동된 사람"
                 android:textColor="@color/dark_gray"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:visibility="gone" />
 
+            <!-- 연동된 사람 버튼 목록 (동적으로 추가) -->
             <LinearLayout
+                android:id="@+id/layout_connected_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="vertical" />
 
-                <EditText
-                    android:id="@+id/et_invite_code"
-                    android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/bg_alarm_item_new"
-                    android:hint="사용자 코드 입력"
-                    android:inputType="textCapCharacters"
-                    android:maxLength="12"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:textColor="@color/black"
-                    android:textColorHint="#A0A0A0" />
-
-                <LinearLayout
-                    android:id="@+id/btn_request_link"
-                    android:layout_width="80dp"
-                    android:layout_height="52dp"
-                    android:background="@drawable/bg_guardian_status"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="연결"
-                        android:textColor="@android:color/white"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- 피보호자 복약 현황 보기 버튼 -->
-            <LinearLayout
-                android:id="@+id/layout_view_patient_calendar"
+            <!-- 연동 없을 때 안내 -->
+            <TextView
+                android:id="@+id/tv_empty_state"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:visibility="gone">
+                android:gravity="center"
+                android:text="아직 연동된 사람이 없어요"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp"
+                android:visibility="gone" />
 
-                <LinearLayout
-                    android:id="@+id/btn_view_patient_calendar"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_guardian_status"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="center">
+            <!-- 스위치 섹션 (ACTIVE 있을 때만 표시) -->
+            <View
+                android:id="@+id/divider_switch"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/light_gray"
+                android:visibility="gone" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="피보호자 복약 현황 보기"
-                        android:textColor="@android:color/white"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- 연동 해제 버튼 -->
             <LinearLayout
-                android:id="@+id/layout_disconnect"
+                android:id="@+id/layout_share_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
                 android:visibility="gone">
 
                 <LinearLayout
-                    android:id="@+id/btn_disconnect_link"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_schedule_done_button_pending"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="center">
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="연동 해제"
-                        android:textColor="#E53935"
-                        android:textSize="14sp"
+                        android:text="복약 상태 공유"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="연동된 사람이 내 복약 현황을 볼 수 있어요"
+                        android:textColor="@color/dark_gray"
+                        android:textSize="12sp" />
                 </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_share_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    app:thumbTint="@color/switch_thumb_color"
+                    app:trackTint="@color/switch_track_color" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_missed_alert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="미복용 알림 전송"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="미완료 약이 있으면 연동된 사람에게 알림을 보내요"
+                        android:textColor="@color/dark_gray"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_missed_alert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:thumbTint="@color/switch_thumb_color"
+                    app:trackTint="@color/switch_track_color" />
             </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

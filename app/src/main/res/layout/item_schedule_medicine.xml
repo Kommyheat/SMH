@@ -32,6 +32,15 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/tv_quantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1정"
+        android:textColor="@color/dark_gray"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
     <!-- 완료/미완료 버튼 -->
     <TextView
         android:id="@+id/btn_take_done"

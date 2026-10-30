@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:background="#F7F8FA">
+    android:background="@color/scan_screen_background">
 
     <TextView
         android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:paddingTop="20dp"
         android:paddingEnd="20dp"
         android:text="약 조회 결과"
-        android:textColor="#111111"
+        android:textColor="@color/scan_title_text"
         android:textSize="22sp"
         android:textStyle="bold" />
 
@@ -25,7 +25,7 @@
         android:paddingEnd="20dp"
         android:paddingBottom="12dp"
         android:text="약품명을 눌러 상세 정보를 확인하세요."
-        android:textColor="#666666"
+        android:textColor="@color/scan_body_text"
         android:textSize="14sp" />
 
 
@@ -46,7 +46,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:backgroundTint="#FF786E"
+        android:backgroundTint="@color/main_coral"
         android:text="다음"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
